@@ -1,6 +1,5 @@
 package codeCraft.events {
 	
-	import codeCraft.debug.Debug;
 	import codeCraft.display.Button;
 	
 	import flash.events.*;

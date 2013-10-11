@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<actionScriptProperties analytics="false" mainApplicationPath="CodeCraft.as" projectUUID="2bc8124c-23a0-4812-9d57-26c195b8034b" version="10">
-  <compiler additionalCompilerArguments="-locale en_US" autoRSLOrdering="true" copyDependentFiles="false" fteInMXComponents="false" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
+<actionScriptProperties analytics="false" mainApplicationPath="CodeCraft.as" projectUUID="2f3b87da-c80e-451e-82f6-c42a55903f7a" version="11">
+  <compiler additionalCompilerArguments="-locale en_US" autoRSLOrdering="true" copyDependentFiles="false" flexSDK="Flex 4.6.0" fteInMXComponents="false" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" useFlashSDK="false" verifyDigests="true" warn="true">
     <compilerSourcePath>
-      <compilerSourcePathEntry kind="1" linkType="1" path="C:/AS3/greensock-as3"/>
       <compilerSourcePathEntry kind="1" linkType="1" path="C:/AS3/src"/>
+      <compilerSourcePathEntry kind="1" linkType="1" path="C:/AS3/greensock-as3"/>
     </compilerSourcePath>
     <libraryPath defaultLinkType="0">
       <libraryPathEntry kind="4" path="">
@@ -12,10 +12,10 @@
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/core.swc" useDefaultLinkType="false"/>
         </excludedEntries>
       </libraryPathEntry>
-      <libraryPathEntry kind="3" linkType="1" path="C:/AS3/src/MonsterDebugger.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="1" linkType="1" path="C:/AS3/src"/>
       <libraryPathEntry kind="1" linkType="1" path="src/media"/>
-      <libraryPathEntry kind="3" linkType="1" path="C:/Program Files (x86)/Adobe/Adobe Flash CS6/Common/Configuration/ActionScript 3.0/libs/11.0/textLayout.swc" useDefaultLinkType="false"/>
-      <libraryPathEntry kind="1" linkType="1" path="C:/Program Files (x86)/Adobe/Adobe Flash CS6/Common/Configuration/ActionScript 3.0/libs"/>
+      <libraryPathEntry kind="3" linkType="1" path="C:/AS3/DragonBones_v2.3.1/DragonBonesLibrary/bin/DragonBones.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="1" linkType="1" path="${FLASHPRO_APPCONFIG}/ActionScript 3.0/libs"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>
@@ -23,6 +23,7 @@
     <application path="CodeCraft.as"/>
   </applications>
   <modules/>
+  <workers/>
   <buildCSSFiles/>
   <flashCatalyst validateFlashCatalystCompatibility="false"/>
 </actionScriptProperties>

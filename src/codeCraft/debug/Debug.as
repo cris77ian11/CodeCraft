@@ -1,14 +1,15 @@
 package codeCraft.debug{
 	
-	import codeCraft.core.CodeCraft;
-	import codeCraft.events.Events;
-	import codeCraft.utils.Arrays;
-	
 	import com.demonsters.debugger.MonsterDebugger;
 	
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import flash.text.TextField;
 	import flash.utils.describeType;
+	
+	import codeCraft.core.CodeCraft;
+	import codeCraft.events.Events;
+	import codeCraft.utils.Arrays;
 	
 	import net.hires.debug.Stats;
 	
@@ -51,14 +52,14 @@ package codeCraft.debug{
 			if (object is Array) {
 				trace(name + ': ARRAY');
 				for (var i:int = 0; i < object.length; i++) {
-					if(object[i] is MovieClip){
+					if(object[i] is MovieClip || object[i] is Object || object[i] is TextField){
 						trace(i + ': ' + object[i] + ' - name: ' + object[i].name);
 					}else {
 						trace(i + ': ' + object[i]);
 					}
 				}
 			}else {
-				if(object is MovieClip){
+				if(object is MovieClip || object is Object || object is TextField){
 					trace(name + ": " + object + ' - name: ' + object.name);
 				}else {
 					trace(name + ": " + object + "");

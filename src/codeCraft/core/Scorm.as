@@ -1,17 +1,14 @@
 package codeCraft.core {
 	import codeCraft.debug.Debug;
-	import codeCraft.display.Button;
 	import codeCraft.error.Validation;
 	import codeCraft.events.Events;
 	import codeCraft.utils.Audio;
 	
 	import com.pipwerks.SCORM;
 	
-	import flash.display.Shape;
 	import flash.events.MouseEvent;
 	
 	public class Scorm {
-		
 		
 		private static var scorm:SCORM;
 		

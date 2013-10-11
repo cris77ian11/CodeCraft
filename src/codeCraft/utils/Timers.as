@@ -5,7 +5,6 @@ package codeCraft.utils {
 	
 	import flash.display.MovieClip;
 	import flash.events.TimerEvent;
-	import flash.sampler.NewObjectSample;
 	import flash.utils.Timer;
 	
 	public class Timers extends MovieClip{

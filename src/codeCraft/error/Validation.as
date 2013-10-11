@@ -1,6 +1,5 @@
 package codeCraft.error {
 
-	import codeCraft.core.CodeCraft;
 	import codeCraft.debug.Debug;
 	
 	import flash.text.TextField;

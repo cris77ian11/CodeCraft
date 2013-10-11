@@ -1,11 +1,5 @@
 package codeCraft.core {
 	
-	import codeCraft.debug.Debug;
-	import codeCraft.display.Button;
-	import codeCraft.events.Events;
-	import codeCraft.utils.Arrays;
-	import codeCraft.utils.Audio;
-	
 	import com.greensock.TweenMax;
 	import com.greensock.easing.Cubic;
 	
@@ -14,6 +8,11 @@ package codeCraft.core {
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.utils.Dictionary;
+	
+	import codeCraft.debug.Debug;
+	import codeCraft.events.Events;
+	import codeCraft.utils.Arrays;
+	import codeCraft.utils.Audio;
 	
 	public class Presentation {
 		
@@ -24,16 +23,10 @@ package codeCraft.core {
 		//variables para la navigation
 		private static var moverPresentacion:Boolean = false;
 		private static var arrayPresentation:Array = new Array();
-		private static var arrayPresentationMovieClip:Array = new Array();
+		private static var arrayPresentationMovieclip:Array = new Array();
 		private static var navigation:Dictionary = new Dictionary();
 		private static var arraySounds:Array = new Array();
 		private static var soundForAnimation:Boolean = false;
-		
-		/*
-		█████████████████████████████████████████████████████████████████████████████████████████████
-		FUNCIONES navigation
-		█████████████████████████████████████████████████████████████████████████████████████████████
-		*/
 		
 		
 		/**
@@ -43,38 +36,67 @@ package codeCraft.core {
 		 * @param	currentPage		El numero actual del fotograma donde se encuentra la presentacion
 		 * @param	pages			Numero total de paginas de la presentacion
 		 */
-		public static function checkNavigation(buttonLeft:Object, buttonRight:Object, currentPage:Number = 1, pages:Number = 1):void {
-			if (pages != 1) {
-				if (currentPage >= pages) {
-					buttonLeft.visible = true;
-					buttonRight.visible = false;
-				}else {
-					if (currentPage <= 1) {
-						buttonLeft.visible = false;
-						buttonRight.visible = true;
-					}else {
+		public static function checkNavigation(buttonLeft:Object, buttonRight:Object, currentPage:Number = 1, pages:Number = 1):void 
+		{
+			//se verifica si se ejecuta un tipo presentacion para usar los botones de navegación, 
+			//si se usa un tipo secuencia o no ejecuta, pero si no se a declarado el diccionario 
+			//navigation en el valor type entonces se ejecuta 
+			if(navigation['type'] == "presentation" || navigation['type'] == undefined)
+			{
+				if (pages != 1) 
+				{
+					//se llega a la ultima pagina
+					if (currentPage >= pages) 
+					{
 						buttonLeft.visible = true;
-						buttonRight.visible = true;
+						buttonRight.visible = false;
+					}
+					else 
+					{
+						//se esta la primera pagina
+						if (currentPage <= 1) 
+						{
+							buttonLeft.visible = false;
+							buttonRight.visible = true;
+						}
+						//se esta en una pagina intermedia
+						else 
+						{
+							buttonLeft.visible = true;
+							buttonRight.visible = true;
+						}
 					}
 				}
-			}else {
-				buttonLeft.visible = false;
-				buttonRight.visible = false;
+				else 
+				{
+					buttonLeft.visible = false;
+					buttonRight.visible = false;
+				}
 			}
-			if(navigation['paging'] != null){
-				if (pages > 1){
+			if(navigation['paging'] != null)
+			{
+				//si el content tiene mas de una pagina mostrara la paginacion de contar solo con una pagina
+				//se asigna un valor vacio al campo que tiene la paginacion
+				if (pages > 1)
+				{
 					navigation['paging'].text = currentPage + "/" + pages;
-				}else {
+				}
+				else 
+				{
 					navigation['paging'].text = "";
 				}
 			}
 		}
 		
 		
-		public static function load(buttonLeft:Object, buttonRight:Object, paging:* = null, container:* = null, noAnimation:Array = null):void {
-			if (container == null) {
+		public static function load(buttonLeft:Object, buttonRight:Object, paging:* = null, container:* = null, noAnimation:Array = null, changeSoundComplete:Boolean = false):void 
+		{
+			if (container == null) 
+			{
 				container = CodeCraft.getMainObject();
-			}else{
+			}
+			else
+			{
 				container.visible = true;
 			}
 			container.gotoAndStop(1);
@@ -83,6 +105,8 @@ package codeCraft.core {
 			navigation['paging'] = paging;
 			navigation['container'] = container;
 			navigation['noAnimation'] = noAnimation;
+			navigation['changeSoundComplete'] = changeSoundComplete;
+			navigation['type'] = "presentation";
 			
 			//se activa el foco para que pueda navegar con el teclado
 			CodeCraft.getMainObject().stage.stageFocusRect = false;
@@ -93,101 +117,167 @@ package codeCraft.core {
 			listenerPresentation();
 		}
 		
-		public static function remove():void {
+		public static function remove():void 
+		{
 			removeListenerPresentation();
-			if(navigation['paging'] != null){
+			//se verifica si se asigno una paginación para dejarla vacia con el fin de que cuando se llame de nuevo
+			//esta no cargue el clip con la paginación que tenia en la presentación anterior
+			if(navigation['paging'] != null)
+			{
 				navigation['paging'].text = "";
 			}
 		}
 		
-		public static function reload():void{
+		public static function reload():void
+		{
 			checkNavigation(navigation['buttonLeft'], navigation['buttonRight'], navigation['container'].currentFrame, navigation['container'].totalFrames);
 		}
 		
+		public static function sequence (container:* = null, paging:* = null, timerChange:Number = 0, changeSoundComplete:Boolean = false):void 
+		{
+			if (container == null) 
+			{
+				container = CodeCraft.getMainObject();
+			}
+			else
+			{
+				container.visible = true;
+			}
+			container.gotoAndStop(1);
+			navigation['paging'] = paging;
+			navigation['container'] = container;
+			navigation['changeSoundComplete'] = changeSoundComplete;
+			navigation['type'] = "sequence";
+			checkNavigation(navigation['buttonLeft'], navigation['buttonRight'], 1, navigation['container'].totalFrames);
+			storePresentation ();
+		}
+		
 		//se utiliza para cargar los audios que van a funcionar con la opcion de la presentacion
-		public static function loadSound(sounds:Array):void{
-			if(CodeCraft.soundActive && navigation['container'] != undefined){
+		public static function loadSound(sounds:Array):void
+		{
+			if(CodeCraft.soundActive && navigation['container'] != undefined)
+			{
 				arraySounds = sounds;
 				frameActual = 0;
 				Events.listener(CodeCraft.getMainObject(),Event.ENTER_FRAME, detectChangeFrame);
 			}
 		}
 		
-		private static function storePresentation():void {
+		private static function storePresentation():void 
+		{
 			var storeObject:Boolean = true;
+			var object:*;
+			navigation['container'].alpha = 0;
 			arrayPresentation = new Array();
-			arrayPresentationMovieClip = new Array();
-			for(var i:uint = 0; i < navigation['container'].numChildren; i++){
-				var object:* = navigation['container'].getChildAt(i);
-				if (object != navigation['buttonLeft'] && object != navigation['buttonRight']){
-					if(navigation['noAnimation'] != null && navigation['noAnimation'] is Array){
-						for(var j:uint = 0; j < navigation['noAnimation'].length; j++){
-							if(object.name == navigation['noAnimation'][j].name || object == navigation['noAnimation'][j]){
+			arrayPresentationMovieclip = new Array();
+			for(var i:uint = 0; i < navigation['container'].numChildren; i++)
+			{
+				object =  navigation['container'].getChildAt(i);
+				if (object != navigation['buttonLeft'] && object != navigation['buttonRight'])
+				{
+					if(navigation['noAnimation'] != null && navigation['noAnimation'] is Array)
+					{
+						for(var j:uint = 0; j < navigation['noAnimation'].length; j++)
+						{
+							if(object.name == navigation['noAnimation'][j].name || object == navigation['noAnimation'][j])
+							{
 								storeObject = false;
 							}
 						}
 					}
-					if(storeObject){
-						object.alpha = 0;
-						if(object is MovieClip){
+					if(storeObject)
+					{
+						if(object is MovieClip)
+						{
 							object.gotoAndStop(1);
-							arrayPresentationMovieClip.push(object);
+							arrayPresentationMovieclip.push(object);
 						}
 						arrayPresentation.push(object);
 					}
 					storeObject = true;
 				}
 			}
-			arrayPresentation.sortOn("name",Array.CASEINSENSITIVE);
+			arrayPresentationMovieclip.sortOn("name",Array.CASEINSENSITIVE);
 			entryAnimation();
 		}
 		
-		private static function navigationButton(e:MouseEvent):void {
-			if (e.currentTarget == navigation['buttonLeft']) { 
+		private static function navigationButton(e:MouseEvent):void 
+		{
+			if (e.currentTarget == navigation['buttonLeft']) 
+			{ 
 				//atras
 				moverPresentacion = false;
-			}else { 
+			}
+			else 
+			{ 
 				//adelante
 				moverPresentacion = true;
 			}
 			outAnimation();
 		}
 		
-		private static function navigationKeyBoard(e:KeyboardEvent):void {
+		private static function navigationKeyBoard(e:KeyboardEvent):void 
+		{
 			var teclaPresionada:Number = e.keyCode;
-			if (teclaPresionada == 37 && navigation['container'].currentFrame > 1) {
+			if (teclaPresionada == 37 && navigation['container'].currentFrame > 1) 
+			{
 				//flecha izquierda
 				moverPresentacion = false;
 				outAnimation();
 			} 
-			if (teclaPresionada == 39 && navigation['container'].currentFrame < navigation['container'].totalFrames) { 
+			if (teclaPresionada == 39 && navigation['container'].currentFrame < navigation['container'].totalFrames) 
+			{ 
 				//flecha derecha
 				moverPresentacion = true;
 				outAnimation();
 			}
 		}
 		
-		private static function entryAnimation():void {
-			TweenMax.allTo(arrayPresentation,0.5,{alpha:1,ease:Cubic.easeOut},0.5,entryAnimationComplete);
-			Arrays.play(arrayPresentationMovieClip);
-		}
-		
-		private static function entryAnimationComplete():void{
-			soundForAnimation = false;
-			if(CodeCraft.soundActive && arraySounds.length > 0){
-				Audio.playAudio(arraySounds[frameActual - 1], 0);
+		private static function navigationAudioComplete():void 
+		{
+			if (navigation['container'].currentFrame < navigation['container'].totalFrames) 
+			{
+				//adelante
+				moverPresentacion = true;
+				outAnimation();
 			}
 		}
 		
-		private static function outAnimation():void {
-			soundForAnimation = true;
-			TweenMax.allTo(arrayPresentation,0.2,{alpha:0},0,outAnimationComplete);
+		private static function entryAnimation():void 
+		{
+			TweenMax.to(navigation['container'],0.5,{alpha:1,ease:Cubic.easeOut, onComplete: entryAnimationComplete});
 		}
 		
-		private static function outAnimationComplete():void{
-			if (moverPresentacion) {
+		private static function entryAnimationComplete():void
+		{
+			Arrays.play(arrayPresentationMovieclip);
+			soundForAnimation = false;
+			if(CodeCraft.soundActive && arraySounds.length > 0)
+			{
+				Audio.playAudio(arraySounds[frameActual - 1], 0);
+				//se verifica si la presentación tiene activo el valor changeCompleteSound
+				//y se agrega el listener que pasa la pagina apenas termine el audio
+				if(navigation['changeSoundComplete'])
+				{
+					Audio.playComplete(0,navigationAudioComplete);
+				}
+			}
+		}
+		
+		private static function outAnimation():void
+		{
+			soundForAnimation = true;
+			TweenMax.to(navigation['container'],0.2,{alpha:0, onComplete: outAnimationComplete});
+		}
+		
+		private static function outAnimationComplete():void
+		{
+			if (moverPresentacion) 
+			{
 				navigation['container'].nextFrame();
-			}else {
+			}
+			else
+			{
 				navigation['container'].prevFrame();
 			}
 			checkNavigation (navigation['buttonLeft'], navigation['buttonRight'], navigation['container'].currentFrame, navigation['container'].totalFrames);
@@ -195,29 +285,37 @@ package codeCraft.core {
 		}
 		
 		//cargar y eliminar los listner que hacen que sirva la presentacion
-		private static function listenerPresentation ():void {
+		private static function listenerPresentation ():void 
+		{
 			Events.listener(navigation['buttonLeft'], MouseEvent.CLICK, navigationButton,true,true);
 			Events.listener(navigation['buttonRight'], MouseEvent.CLICK, navigationButton,true,true);
 			Events.listener(CodeCraft.getMainObject(),KeyboardEvent.KEY_DOWN, navigationKeyBoard);
 			Events.listener(navigation['container'], MouseEvent.CLICK, CodeCraft.focoNavigation,false);
 		}
-		private static function removeListenerPresentation ():void {
+		private static function removeListenerPresentation ():void 
+		{
 			Events.removeListener(navigation['buttonLeft'], MouseEvent.CLICK, navigationButton);
 			Events.removeListener(navigation['buttonRight'], MouseEvent.CLICK, navigationButton);
 			Events.removeListener(CodeCraft.getMainObject(),KeyboardEvent.KEY_DOWN, navigationKeyBoard);
 			Events.removeListener(navigation['container'], MouseEvent.CLICK, CodeCraft.focoNavigation,false);
-			if(CodeCraft.soundActive){
+			if(CodeCraft.soundActive)
+			{
 				Events.removeListener(CodeCraft.getMainObject(),Event.ENTER_FRAME, detectChangeFrame);
 				Audio.stopSoundPresentation();
 			}
 		}
 		
-		private static function detectChangeFrame (event:Event):void {
-			if(frameActual != navigation['container'].currentFrame){
+		private static function detectChangeFrame (event:Event):void 
+		{
+			if(frameActual != navigation['container'].currentFrame)
+			{
 				frameActual = navigation['container'].currentFrame;
-				if(soundForAnimation){
+				if(soundForAnimation)
+				{
 					Audio.stopSoundPresentation();
-				}else {
+				}
+				else 
+				{
 					Audio.playAudio(arraySounds[frameActual - 1], 0);
 				}
 			}

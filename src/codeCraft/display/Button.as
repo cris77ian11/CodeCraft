@@ -12,7 +12,6 @@ package codeCraft.display {
 	
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.media.Sound;
 	
 	public class Button {
 		

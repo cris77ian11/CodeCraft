@@ -1,7 +1,5 @@
-package codeCraft.utils {
-	import codeCraft.display.Button;
-	
-	import flash.display.MovieClip;
+package codeCraft.utils 
+{
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.media.Sound;
@@ -10,127 +8,227 @@ package codeCraft.utils {
 	import flash.media.SoundTransform;
 	import flash.net.URLRequest;
 	
-	public class Audio {
+	import codeCraft.display.Button;
+	import codeCraft.error.Validation;
+	
+	public class Audio 
+	{
 		
-		public static var volumenPresentation:int = 1;
-		public static var volumenBackground:int = 1;
+		/* Cambian el valor del volumen tanto de fondo como de la presentacion */
+		private static var _volumenPresentation:int = 1;
+		private static var _volumenBackground:int = 1;
+		private static var _channelPresentation:SoundChannel = new SoundChannel();
+		private static var _channelBackground:SoundChannel = new SoundChannel();
+		/* Es una variable creada para suplantar un audio vacio, o un valor sin sonido */
+		private static var _audio:Sound = new Sound();
+		private static var _soundTransformPresentation:SoundTransform = new SoundTransform();
+		private static var _soundTransformBackground:SoundTransform = new SoundTransform();
+		/* Almacenan el sonido que se reproduce actualmente para cada uno de los caneles */
+		private static var _soundPresentation:* = null;
+		private static var _soundBackground:* = null;
+		private static var _url:URLRequest;
+		private static var _arraySoundChannel:Array = new Array();
+		/* Almacena la funcion que retorna cada vez que termina de reproducir un audio */
+		private static var _functionReturnComplete:Function;
 		
-		private static var channelPresentation:SoundChannel = new SoundChannel();
-		private static var channelBackground:SoundChannel = new SoundChannel();
-		private static var audio:Sound = new Sound();
-		private static var soundTransformPresentation:SoundTransform = new SoundTransform();
-		private static var soundTransformBackground:SoundTransform = new SoundTransform();
-		private static var soundPresentation:* = null;
-		private static var soundBackground:* = null;
-		private static var url:URLRequest;
-		private static var arraySoundChannel:Array = new Array();
-		private static var positionSoundPresentation:Number;
-		
-		public static function stopPresetation(event:MouseEvent):void{
-			channelPresentation.stop();
-			if (volumenPresentation == 1) {
+		/**
+		 * Detiene el sonido de la presentación, la funcion esta como publica para permitir que
+		 * se asigne a objeto, por defecto la función ya esta asignada a el boton de sonido
+		 * del menu de opciones que se carga con CodeCraft.addMenu();
+		 * 
+		 * Su funcionamiento se basa en subir o bajar el volumen que tiene el channel del audio 
+		 * de la presentacion, cuando es 1 suena y cuando es 0 no suena, se encarga tambien de
+		 * detener la animacion del boton para indicar que se silencio el audio, si se usa un
+		 * objeto diferente para llamar a esta funcion se debera tener en cuenta que la animacion
+		 * del boton sea igual a la animacion de los botones cargados por la libreria
+		 */
+		public static function stopPresetation(event:MouseEvent):void
+		{
+			_channelPresentation.stop();
+			if (_volumenPresentation == 1) 
+			{
 				//Silencia
 				event.currentTarget.gotoAndStop('silencio');
 				Button.removeOver(event.currentTarget,1);
-				volumenPresentation = 0;
-				positionSoundPresentation = channelPresentation.position;
-				channelPresentation.stop();
-			} else {
+				_volumenPresentation = 0;
+				_channelPresentation.stop();
+			} 
+			else
+			{
 				//reproduce de  nuevo
 				event.currentTarget.gotoAndStop('normal');
-				volumenPresentation = 1;
+				_volumenPresentation = 1;
 				Button.over(event.currentTarget,1,null,true);
-				playAudio (soundPresentation,0);
+				playAudio (_soundPresentation,0);
 			}
-			soundTransformPresentation = channelPresentation.soundTransform;
-			soundTransformPresentation.volume = volumenPresentation;
-			channelPresentation.soundTransform = soundTransformPresentation;
+			_soundTransformPresentation = _channelPresentation.soundTransform;
+			_soundTransformPresentation.volume = _volumenPresentation;
+			_channelPresentation.soundTransform = _soundTransformPresentation;
 		}
 		
-		public static function stopBackground(event:MouseEvent):void{
-			channelBackground.stop();
-			if (volumenBackground == 1) {
+		public static function stopBackground(event:MouseEvent):void
+		{
+			_channelBackground.stop();
+			if (_volumenBackground == 1) 
+			{
 				//Silencia
 				event.currentTarget.gotoAndStop('silencio');
 				Button.removeOver(event.currentTarget,1);
-				volumenBackground = 0;
-				channelBackground.stop();
-			} else {
+				_volumenBackground = 0;
+				_channelBackground.stop();
+			} 
+			else 
+			{
 				//reproduce de  nuevo
 				event.currentTarget.gotoAndStop('normal');
-				volumenBackground = 1;
+				_volumenBackground = 1;
 				Button.over(event.currentTarget,1,2,true);
-				playAudio (soundBackground,1);
+				playAudio (_soundBackground,1);
 			}
-			soundTransformBackground = channelBackground.soundTransform;
-			soundTransformBackground.volume = volumenBackground;
-			channelBackground.soundTransform = soundTransformBackground;
+			_soundTransformBackground = _channelBackground.soundTransform;
+			_soundTransformBackground.volume = _volumenBackground;
+			_channelBackground.soundTransform = _soundTransformBackground;
 		}
 		
-		public static function stopSoundPresentation():void{
-			channelPresentation.stop();
-			soundPresentation = null;
+		public static function stopSoundPresentation():void
+		{
+			_channelPresentation.stop();
+			_soundPresentation = null;
 		}
 		
-		public static function stopAllSound():void{
-			channelBackground.stop();
-			channelPresentation.stop();
+		public static function stopAllSound(clearChannel:Boolean = false):void
+		{
+			_channelBackground.stop();
+			_channelPresentation.stop();
+			//soundMixer detiene todos los demas sonidos que no hayan sido agregados a los dos caneles
 			SoundMixer.stopAll();
+			//limpiamos el canal para agregar otro _audio o evitar que el _audio se reprodusca nuevamente
+			if(clearChannel)
+			{
+				playAudio(null,0);
+				playAudio(null,1);
+			}
 		}
 		
-		public static function stopSound(ruta:* = null, numberChannel:int = 1):void {
-			
+		public static function stopSound(numberChannel:int = 1, clearChannel:Boolean = false):void 
+		{
+			if(numberChannel == 1)
+			{
+				_channelBackground.stop();
+			}
+			else 
+			{
+				_channelPresentation.stop();
+			}	
+			//limpiamos el canal para agregar otro _audio o evitar que el _audio se reprodusca nuevamente
+			if(clearChannel)
+			{
+				playAudio(null,numberChannel);
+			}
 		}
 		
 		
-		public static function playAudio (ruta:* = null, numberChannel:int = 1, loopSound:Boolean = false):void {
+		public static function playAudio (ruta:* = null, numberChannel:int = 1, loopSound:Boolean = false):void 
+		{
 			var numberLoop:int = 0;
-			if(loopSound){
+			if(loopSound)
+			{
 				numberLoop = 100;
 			}
-			try{
-				if (ruta != null) {
-					if(ruta is Array){
+			try
+			{
+				if (ruta != null) 
+				{
+					if(ruta is Array)
+					{
 						ruta  = ruta[0];
 					}
-					if (ruta is String) {
-						url = new URLRequest(ruta);
-						audio = new Sound(url);
-					} else {
-						if(ruta is Sound){
-							audio = ruta;								
-						}else {
-							audio = new ruta();
+					if (ruta is String) 
+					{
+						_url = new URLRequest(ruta);
+						_audio = new Sound(_url);
+					}
+					else 
+					{
+						if(ruta is Sound)
+						{
+							_audio = ruta;								
+						}
+						else 
+						{
+							_audio = new ruta();
 						}
 					}
-					if(numberChannel == 1){
-						channelBackground.stop();
-						soundBackground = ruta;
-						if(volumenBackground == 1){
-							channelBackground = audio.play(0,numberLoop);
-						}
-					}else {
-						if(soundPresentation != ruta){
-							positionSoundPresentation = 0;
-						}
-						channelPresentation.stop();
-						soundPresentation = ruta;
-						if(volumenPresentation == 1){
-							channelPresentation = audio.play(positionSoundPresentation,numberLoop);
+					if(numberChannel == 1)
+					{
+						_channelBackground.stop();
+						_soundBackground = ruta;
+						if(_volumenBackground == 1)
+						{
+							_channelBackground = _audio.play(0,numberLoop);
 						}
 					}
-				}else {
-					if(numberChannel == 1){
-						channelBackground.stop();
-						soundBackground = ruta;
-					}else {
-						channelPresentation.stop();
-						soundPresentation = ruta;
+					else 
+					{
+						_channelPresentation.stop();
+						_soundPresentation = ruta;
+						if(_volumenPresentation == 1)
+						{
+							_channelPresentation = _audio.play(0,numberLoop);
+						}
+					}
+				}
+				else 
+				{
+					if(numberChannel == 1)
+					{
+						_channelBackground.stop();
+						_soundBackground = ruta;
+					}
+					else 
+					{
+						_channelPresentation.stop();
+						_soundPresentation = ruta;
 					}					
 				}
-			}catch(error:Error){
-				trace('url has not sound');
+			}
+			catch(error:Error)
+			{
+				Validation.error('url has not sound');
 			}
 		}
+		
+		
+		public static function playComplete(numberChannel:int = 1, functionReturn:Function = null):void
+		{
+			if(functionReturn != null)
+			{
+				_functionReturnComplete = functionReturn;
+				//se verifica el canal y se agregan los listener que retornan la funcion
+				if(numberChannel == 1)
+				{
+					_channelBackground.addEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+				}
+				else 
+				{
+					_channelPresentation.addEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+				}	
+			}
+			else 
+			{
+				Validation.error('playComplete, la funcion a retornar presenta errores, verifique que no sea null');
+			}
+		}
+		
+		
+		private static function soundChannelComplete (event:Event):void 
+		{
+			//se elimina listener, devuelve la funcion y se limpia de la memoria
+			event.currentTarget.removeEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+			_functionReturnComplete();
+			_functionReturnComplete = null;
+		}
+		
+		
 	}
 }
