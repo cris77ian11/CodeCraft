@@ -48,23 +48,42 @@ package codeCraft.debug{
 			}
 		}
 		
-		public static function print(object:*, name:String = "trace", type:String = ''):void {
-			if (object is Array) {
-				trace(name + ': ARRAY');
-				for (var i:int = 0; i < object.length; i++) {
-					if(object[i] is MovieClip || object[i] is Object || object[i] is TextField){
-						trace(i + ': ' + object[i] + ' - name: ' + object[i].name);
-					}else {
-						trace(i + ': ' + object[i]);
+		public static function print(object:*, name:String = "Trace", type:String = ''):void 
+		{
+			try
+			{
+				if (object is Array) 
+				{
+					trace(type + name + ': ARRAY');
+					for (var i:int = 0; i < object.length; i++) 
+					{
+						if(object[i] is String || object[i] is Number || object[i] is Boolean)
+						{
+							trace(i + ': ' + object[i]);
+						}
+						else 
+						{
+							trace(i + ': ' + object[i] + ' - name: ' + object[i].name);
+						}
 					}
 				}
-			}else {
-				if(object is MovieClip || object is Object || object is TextField){
-					trace(name + ": " + object + ' - name: ' + object.name);
-				}else {
-					trace(name + ": " + object + "");
+				else 
+				{
+					if(object is String || object is Number || object is Boolean)
+					{
+						trace(type + name + ": " + object + "");
+					}
+					else 
+					{
+						trace(type + name + ": " + object + ' - name: ' + object.name);
+					}
 				}
 			}
+			catch(error:Error)
+			{
+				trace("Error CodeCraft Debug.print: Un valor que se trata de imprimir no es admitido.");
+			}
+				
 		}
 		
 		public static function printFunction (object:* = null, textConsole:String = ''):void {

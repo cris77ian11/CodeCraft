@@ -9,7 +9,7 @@ package codeCraft.utils
 	import flash.net.URLRequest;
 	
 	import codeCraft.display.Button;
-	import codeCraft.error.Validation;
+	import codeCraft.debug.Debug;
 	
 	public class Audio 
 	{
@@ -29,7 +29,7 @@ package codeCraft.utils
 		private static var _url:URLRequest;
 		private static var _arraySoundChannel:Array = new Array();
 		/* Almacena la funcion que retorna cada vez que termina de reproducir un audio */
-		private static var _functionReturnComplete:Function;
+		private static var _functionReturnComplete:Function = null;
 		
 		/**
 		 * Detiene el sonido de la presentación, la funcion esta como publica para permitir que
@@ -41,6 +41,8 @@ package codeCraft.utils
 		 * detener la animacion del boton para indicar que se silencio el audio, si se usa un
 		 * objeto diferente para llamar a esta funcion se debera tener en cuenta que la animacion
 		 * del boton sea igual a la animacion de los botones cargados por la libreria
+		 * 
+		 * @param event
 		 */
 		public static function stopPresetation(event:MouseEvent):void
 		{
@@ -60,12 +62,17 @@ package codeCraft.utils
 				_volumenPresentation = 1;
 				Button.over(event.currentTarget,1,null,true);
 				playAudio (_soundPresentation,0);
+				playComplete(0,_functionReturnComplete);
 			}
 			_soundTransformPresentation = _channelPresentation.soundTransform;
 			_soundTransformPresentation.volume = _volumenPresentation;
 			_channelPresentation.soundTransform = _soundTransformPresentation;
 		}
 		
+		/**
+		 * 
+		 * @param event
+		 */
 		public static function stopBackground(event:MouseEvent):void
 		{
 			_channelBackground.stop();
@@ -90,12 +97,20 @@ package codeCraft.utils
 			_channelBackground.soundTransform = _soundTransformBackground;
 		}
 		
+		/**
+		 * 
+		 */
 		public static function stopSoundPresentation():void
 		{
 			_channelPresentation.stop();
 			_soundPresentation = null;
 		}
 		
+		
+		/**
+		 * 
+		 * @param stopAllSound	
+		 */
 		public static function stopAllSound(clearChannel:Boolean = false):void
 		{
 			_channelBackground.stop();
@@ -110,6 +125,11 @@ package codeCraft.utils
 			}
 		}
 		
+		/**
+		 * 
+		 * @param numberChannel 
+		 * @param clearChannel	
+		 */
 		public static function stopSound(numberChannel:int = 1, clearChannel:Boolean = false):void 
 		{
 			if(numberChannel == 1)
@@ -127,7 +147,12 @@ package codeCraft.utils
 			}
 		}
 		
-		
+		/**
+		 * 
+		 * @param ruta
+		 * @param numberChannel
+		 * @param loopSound
+		 */
 		public static function playAudio (ruta:* = null, numberChannel:int = 1, loopSound:Boolean = false):void 
 		{
 			var numberLoop:int = 0;
@@ -194,11 +219,16 @@ package codeCraft.utils
 			}
 			catch(error:Error)
 			{
-				Validation.error('url has not sound');
+				Debug.print("url has not sound","Audio.playAudio","Falla CodeCraft ");
 			}
 		}
 		
 		
+		/**
+		 * 
+		 * @param numberChannel
+		 * @param functionReturn
+		 */
 		public static function playComplete(numberChannel:int = 1, functionReturn:Function = null):void
 		{
 			if(functionReturn != null)
@@ -216,11 +246,30 @@ package codeCraft.utils
 			}
 			else 
 			{
-				Validation.error('playComplete, la funcion a retornar presenta errores, verifique que no sea null');
+				if(_functionReturnComplete != null)
+				{
+					if(numberChannel == 1)
+					{
+						_channelBackground.removeEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+						_channelBackground.addEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+					}
+					else 
+					{
+						_channelPresentation.removeEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+						_channelPresentation.addEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+					}	
+				}
+				else 
+				{
+					Debug.print("La funcion a retornar presenta errores, verifique que no sea null","Audio.playComplete","Falla CodeCraft");
+				}			
 			}
 		}
 		
-		
+		/**
+		 * 
+		 * @param event	
+		 */
 		private static function soundChannelComplete (event:Event):void 
 		{
 			//se elimina listener, devuelve la funcion y se limpia de la memoria
