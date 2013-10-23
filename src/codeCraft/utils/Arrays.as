@@ -1,28 +1,47 @@
 package codeCraft.utils {
+	import codeCraft.debug.Debug;
 	import codeCraft.error.Validation;
 	
-	public class Arrays	{
+	public class Arrays	
+	{
 		
 		
-		public static function stop(array:Array):void{
-			try {
-				for(var i:int = 0; i < array.length; i++){
+		public static function stop(array:Array):void
+		{
+			try
+			{
+				for(var i:int = 0; i < array.length; i++)
+				{
 					array[i].stop();
 				}
-			}catch(error:Error){
-				Validation.error('El parametro a pasar debe ser un array que contenga movieClips');
+			}
+			catch(error:Error)
+			{
+				Debug.print("No se puede detener los movieclips en el fotograma especificado.","Arrays.stop","Falla CodeCraft ");
 			}
 		}
 		
-		public static function play(array:Array):void{
-			try {
-				for(var i:int = 0; i < array.length; i++){
-					if(array[i].currentLabel != 'noAnimation'){
+		public static function play(array:Array):void
+		{
+			try 
+			{
+				for(var i:int = 0; i < array.length; i++)
+				{
+					var nameObject:String = "";
+					//se verifica si si el elemento tiene un label asignado
+					if(array[i].currentLabel != null)
+					{
+						nameObject = array[i].currentLabel;
+					}
+					if(nameObject.substr(0,2) != 'no')
+					{
 						array[i].play();
 					}
 				}
-			}catch(error:Error){
-				Validation.error('El parametro a pasar debe ser un array que contenga movieClips');
+			}
+			catch(error:Error)
+			{
+				Debug.print("No se puede aplicar play a los movieclips.","Arrays.play","Falla CodeCraft ");
 			}
 		}
 		
