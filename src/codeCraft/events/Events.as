@@ -28,7 +28,7 @@ package codeCraft.events {
 					clipTemp = object;
 				}
 				//se detecta si la funcion es un MouseEvent para agregar el buttonMode
-				if (modeButton && (clipTemp.hasEventListener(MouseEvent.CLICK) || clipTemp.hasEventListener(MouseEvent.MOUSE_DOWN) || clipTemp.hasEventListener(MouseEvent.MOUSE_UP))) 
+				if (modeButton && (accion == MouseEvent.CLICK || accion == MouseEvent.MOUSE_DOWN) && (clipTemp.hasEventListener(MouseEvent.CLICK) || clipTemp.hasEventListener(MouseEvent.MOUSE_DOWN))) 
 				{
 					Button.button(object);
 				}
@@ -52,7 +52,7 @@ package codeCraft.events {
 				{
 					clipTemp = object;
 				}
-				if (modeButton && (clipTemp.hasEventListener(MouseEvent.CLICK) || clipTemp.hasEventListener(MouseEvent.MOUSE_DOWN) || clipTemp.hasEventListener(MouseEvent.MOUSE_UP))) 
+				if (modeButton && (accion == MouseEvent.CLICK || accion == MouseEvent.MOUSE_DOWN) && (clipTemp.hasEventListener(MouseEvent.CLICK) || clipTemp.hasEventListener(MouseEvent.MOUSE_DOWN))) 
 				{
 					Button.button(object, !modeButton);
 					Button.removeOver(object);

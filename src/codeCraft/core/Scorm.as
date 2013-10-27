@@ -2,7 +2,7 @@ package codeCraft.core {
 	import codeCraft.debug.Debug;
 	import codeCraft.error.Validation;
 	import codeCraft.events.Events;
-	import codeCraft.utils.Audio;
+	import codeCraft.media.Audio;
 	
 	import com.pipwerks.SCORM;
 	

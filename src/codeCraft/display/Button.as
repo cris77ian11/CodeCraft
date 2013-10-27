@@ -28,8 +28,9 @@ package codeCraft.display {
 		 * @param enabeld Estado de la accion, true activa y false desactiva
 		 * @param clicActive Activa la animacion del boton al presionar, true activa y false desactiva	
 		 */
-		public static function button (object:*, enabled:Boolean = true, clicActive:Boolean = true):void 
+		public static function button (object:*, enabled:* = true, clicActive:Boolean = true):void 
 		{
+			var enabledTemp:* = enabled;
 			try 
 			{
 				if(object is Array)
@@ -37,21 +38,31 @@ package codeCraft.display {
 					
 					for (var i:uint = 0; i < object.length; i++) 
 					{
+						//se detecta si enabled es un array  y se toma solo el valor de su primer campo
+						if (enabled is Array)
+						{
+							enabledTemp = enabled[i];
+						}
 						//activa el modo button del mouse a el elemento y los hijos de este
 						//de esta forma se evita que si tiene textos no haga efecto modo boton
-						object[i].buttonMode = enabled;
-						object[i].mouseChildren = !enabled;
+						object[i].buttonMode = enabledTemp;
+						object[i].mouseChildren = !enabledTemp;
 					}
 				}
 				else 
 				{
-					object.buttonMode = enabled;
-					object.mouseChildren = !enabled;
+					//se detecta si enabled es un array  y se toma solo el valor de su primer campo
+					if (enabled is Array)
+					{
+						enabledTemp = enabled[0];
+					}
+					object.buttonMode = enabledTemp;
+					object.mouseChildren = !enabledTemp;
 				}
 				//el clicActive es utilizado para realizar una animacion al presionar el boton
 				if(clicActive) 
 				{
-					if(enabled)
+					if(enabledTemp)
 					{
 						Events.listener(object,MouseEvent.CLICK, Button.clickACtive,false,false);
 					}

@@ -1,4 +1,4 @@
-package codeCraft.utils 
+package codeCraft.media 
 {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -33,6 +33,9 @@ package codeCraft.utils
 		/* Posicion actual del sonido para realizar una pausa */
 		private static var _positionSoundPresentation:Number = 0;
 		private static var _positionSoundBackground:Number = 0;
+		/* Indicaran si los canales del audio estan activos o no lo estan */
+		private static var _channelPresentationActive:Boolean = false;
+		private static var _channelBackgroundActive:Boolean = false;
 		
 		/**
 		 * Detiene el sonido de la presentación, la funcion esta como publica para permitir que
@@ -53,6 +56,7 @@ package codeCraft.utils
 			if(_functionReturnComplete == null)
 			{
 				_channelPresentation.stop();
+				_channelBackgroundActive = false;
 			}
 			if (_volumenPresentation == 1) 
 			{
@@ -85,10 +89,11 @@ package codeCraft.utils
 		 */
 		public static function stopBackground(event:MouseEvent):void
 		{
-			//se verifica si tiene un listner activo al finalizar el audio
+			//se verifica si tiene un listener activo para no tener el audio
 			if(_functionReturnComplete == null)
 			{
 				_channelBackground.stop();
+				_channelBackgroundActive = false;
 			}
 			if (_volumenBackground == 1) 
 			{
@@ -117,26 +122,51 @@ package codeCraft.utils
 			{
 				//almacena la posicion actual del audio
 				_positionSoundPresentation = _channelPresentation.position;
-				_channelPresentation.stop();
+				stopSoundPresentation();
 				//se cambia la posicion del boton que se presion
 				event.currentTarget.gotoAndStop("play");
+				_channelPresentationActive = false;
 			}
 			else
 			{
 				playAudio(_soundPresentation,0,false,_positionSoundPresentation);
 				playComplete(0,_functionReturnComplete);
 				event.currentTarget.gotoAndStop("pause");
+				_channelPresentationActive = true;
 			}
 		}
 		
 		/**
 		 * 
 		 */
-		public static function stopSoundPresentation():void
+		public static function stopSoundPresentation(clearChannel:Boolean = true):void
 		{
 			_channelPresentation.stop();
-			_soundPresentation = null;
-			_functionReturnComplete = null;
+			if(clearChannel)
+			{
+				playAudio(null,0);
+			}
+			_channelPresentationActive = false;
+			//se verifica si tiene un listener el canal
+			if(_channelPresentation.hasEventListener(Event.SOUND_COMPLETE))
+			{
+				_channelPresentation.removeEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+			}
+		}
+		
+		/**
+		 *  
+		 * @param clearChannel	
+		 */
+		public static function stopSoundBackground (clearChannel:Boolean = false):void 
+		{
+			
+			_channelBackground.stop();
+			if(clearChannel)
+			{
+				playAudio(null,0);
+			}
+			_channelBackgroundActive = false;
 			//se verifica si tiene un listener el canal
 			if(_channelBackground.hasEventListener(Event.SOUND_COMPLETE))
 			{
@@ -161,29 +191,19 @@ package codeCraft.utils
 				playAudio(null,0);
 				playAudio(null,1);
 			}
+			//se verifica si tiene un listener el canal
+			if(_channelPresentation.hasEventListener(Event.SOUND_COMPLETE))
+			{
+				_channelPresentation.removeEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+			}
+			if(_channelBackground.hasEventListener(Event.SOUND_COMPLETE))
+			{
+				_channelBackground.removeEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+			}
+			_channelBackgroundActive = false;
+			_channelPresentationActive = false;
 		}
 		
-		/**
-		 * 
-		 * @param numberChannel 
-		 * @param clearChannel	
-		 */
-		public static function stopSound(numberChannel:int = 1, clearChannel:Boolean = false):void 
-		{
-			if(numberChannel == 1)
-			{
-				_channelBackground.stop();
-			}
-			else 
-			{
-				_channelPresentation.stop();
-			}	
-			//limpiamos el canal para agregar otro _audio o evitar que el _audio se reprodusca nuevamente
-			if(clearChannel)
-			{
-				playAudio(null,numberChannel);
-			}
-		}
 		
 		/**
 		 * 
@@ -228,6 +248,8 @@ package codeCraft.utils
 						_soundBackground = ruta;
 						_channelBackground = _audio.play(position,numberLoop);
 						_channelBackground.soundTransform = _soundTransformBackground;
+						_channelBackgroundActive = true;
+						_channelBackground.addEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
 					}
 					else 
 					{
@@ -235,6 +257,8 @@ package codeCraft.utils
 						_soundPresentation = ruta;
 						_channelPresentation = _audio.play(position,numberLoop);
 						_channelPresentation.soundTransform = _soundTransformPresentation;
+						_channelPresentationActive = true;
+						_channelPresentation.addEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
 					}
 				}
 				else 
@@ -243,11 +267,13 @@ package codeCraft.utils
 					{
 						_channelBackground.stop();
 						_soundBackground = ruta;
+						_channelBackgroundActive = false;
 					}
 					else 
 					{
 						_channelPresentation.stop();
 						_soundPresentation = ruta;
+						_channelPresentationActive = false;
 					}					
 				}
 			}
@@ -300,6 +326,43 @@ package codeCraft.utils
 			}
 		}
 		
+		
+		public static function getStatusSound (numberChannel:int = 0):Boolean
+		{
+			if(numberChannel == 0)
+			{
+				return _channelPresentationActive;
+			}
+			else
+			{
+				return _channelBackgroundActive;
+			}
+		}
+		
+		public static function getPositionSound (numberChannel:int = 0):Number
+		{
+			if(numberChannel == 0)
+			{
+				return  _channelPresentation.position;
+			}
+			else
+			{
+				return  _channelBackground.position;
+			}
+		}
+		
+		public static function playCurrentSoundPosition (numberChannel:int = 0, position:Number = 0):void 
+		{
+			if(numberChannel == 0)
+			{
+				playAudio(_soundPresentation,0,false,position);
+			}
+			else
+			{
+				playAudio(_soundBackground,1,false,position);
+			}
+		}
+		
 		/**
 		 * 
 		 * @param event	
@@ -308,8 +371,20 @@ package codeCraft.utils
 		{
 			//se elimina listener, devuelve la funcion y se limpia de la memoria
 			event.currentTarget.removeEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
-			_functionReturnComplete();
-			_functionReturnComplete = null;
+			if (event.currentTarget == _channelPresentation)
+			{
+				_channelPresentationActive = false;
+			}
+			if(event.currentTarget == _channelBackground)
+			{
+				_channelBackgroundActive = false;
+			}
+			//se verifica si anteriormente se asigno una funcion a retornar por medio de la funcion playComplete
+			if(_functionReturnComplete != null)
+			{
+				_functionReturnComplete();
+				_functionReturnComplete = null;
+			}
 		}
 		
 		

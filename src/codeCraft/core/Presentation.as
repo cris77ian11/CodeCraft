@@ -12,7 +12,7 @@ package codeCraft.core {
 	import codeCraft.debug.Debug;
 	import codeCraft.events.Events;
 	import codeCraft.utils.Arrays;
-	import codeCraft.utils.Audio;
+	import codeCraft.media.Audio;
 	import codeCraft.utils.Timers;
 	
 	public class Presentation {
@@ -20,6 +20,7 @@ package codeCraft.core {
 		//sound
 		private static var frameActual:Number;
 		private static var positionArray:Number;
+		private static var _soundActive:Boolean = false;
 		
 		//variables para la navigation
 		private static var moverPresentacion:Boolean = false;
@@ -27,6 +28,7 @@ package codeCraft.core {
 		private static var navigation:Dictionary = new Dictionary();
 		private static var arraySounds:Array = new Array();
 		private static var soundForAnimation:Boolean = false;
+		
 		
 		
 		/**
@@ -189,8 +191,9 @@ package codeCraft.core {
 		//se utiliza para cargar los audios que van a funcionar con la opcion de la presentacion
 		public static function loadSound(sounds:Array):void
 		{
-			if(CodeCraft.soundActive && navigation['container'] != undefined)
+			if(navigation['container'] != undefined)
 			{
+				_soundActive = true;
 				arraySounds = sounds;
 				frameActual = 0;
 				Events.listener(CodeCraft.getMainObject(),Event.ENTER_FRAME, detectChangeFrame);
@@ -292,7 +295,7 @@ package codeCraft.core {
 		{
 			Arrays.play(arrayPresentationMovieclip);
 			soundForAnimation = false;
-			if(CodeCraft.soundActive && arraySounds.length > 0)
+			if(_soundActive && arraySounds.length > 0)
 			{
 				Audio.playAudio(arraySounds[frameActual - 1], 0);
 				//se verifica si la presentación tiene activo el valor changeCompleteSound
@@ -370,7 +373,7 @@ package codeCraft.core {
 			Events.removeListener(navigation['buttonRight'], MouseEvent.CLICK, navigationButton);
 			Events.removeListener(CodeCraft.getMainObject(),KeyboardEvent.KEY_DOWN, navigationKeyBoard);
 			Events.removeListener(navigation['container'], MouseEvent.CLICK, CodeCraft.focoNavigation,false);
-			if(CodeCraft.soundActive)
+			if(_soundActive)
 			{
 				Events.removeListener(CodeCraft.getMainObject(),Event.ENTER_FRAME, detectChangeFrame);
 				Audio.stopSoundPresentation();

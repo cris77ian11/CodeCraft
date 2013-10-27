@@ -4,40 +4,37 @@
 	import flash.display.MovieClip;
 	import flash.display.Shape;
 	import flash.display.StageAlign;
-	import flash.display.StageDisplayState;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
-	import flash.events.FullScreenEvent;
-	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.ProgressEvent;
 	import flash.system.System;
 	import flash.text.TextField;
+	import flash.ui.ContextMenu;
+	import flash.ui.ContextMenuItem;
 	
 	import codeCraft.debug.Debug;
-	import codeCraft.display.Button;
+	import codeCraft.display.Menu;
 	import codeCraft.error.Validation;
 	import codeCraft.events.Events;
 	import codeCraft.utils.Arrays;
-	import codeCraft.utils.Audio;
-	
 	
 	
 	public class CodeCraft 
 	{
 		
+		/* Indicara la resolucion por defecto que debera tener la multimedia, esto con el fin de aplicar la mascara */
+		public static var _resolutionScreen:Array = new Array(1000, 640);
+		
 		//si se cambia el valor de esta variable la mascara quedara desactivda y se podra ver el contenido fuera de la resolucion prestablecida para los multimedias
 		public static var activeMask:Boolean = true;
 		private static var maskStage:Shape = new Shape();
 		
-		//menu the options, sound and fullScreen
-		private static var menuOptions:MovieClip;
-		private static var buttonSound:MovieClip;
-		private static var buttonSoundBackground:MovieClip;
-		private static var buttonFullScreen:MovieClip;
-		private static var menuOptionsLoaded:Boolean = false;
-		private static var fullScreenActive:Boolean = false;
-		public static var soundActive:Boolean = false;
+		/* Variables utilizadas para el manejo de los menus de la clase Menu */
+		private static var _mainMenu:MovieClip = new MovieClip;
+		private static var _optionsMenu:MovieClip = new MovieClip;
+		public static var mainMenuLoaded:Boolean = false;
+		public static var optionsMenuLoaded:Boolean = false;
 		
 		//almacene el objeto padre, root o contenedor de la multimedia
 		private static var mainObject:Object;
@@ -46,22 +43,32 @@
 		private static var functionReturnPreload:Function;
 		private static var frameCurrent:int = 1;
 		
-		//opciones del preload
-		private static var preloadAnimation:MovieClip;
-		private static var textoPreload:TextField = new TextField();
+		/* MovieClip que realiza la ainmacion de la precarga */
+		private static var _preloadAnimation:MovieClip;
+		/* Modificacion del menu contextual, el clic derecho  */
+		private static var _menuContext:ContextMenu = new ContextMenu();
 		
-		/*
-		█████████████████████████████████████████████████████████████████████████████████████████████
-		FUNCIONES GENERALES
-		█████████████████████████████████████████████████████████████████████████████████████████████
-		*/
 		
+		/*********************************************************************************************************
+		 * 
+		 * funciones de uso general de la libreria
+		 * 
+		 * ******************************************************************************************************/
+		
+		
+		/**
+		 * Es funcion obligatoria para iniciar la libreria de la codecraft y hacer uso de las funciones, la precarga esta 
+		 * prediseñada y almacenada en un swc, la precarga se debe configurar en el panel de ActionScrip la carga de
+		 * la clase en el fotograma 2 y tener dos fotogramas disponibles en la linea de tiempo del documento fla.
+		 * @param object Indica cual es el objeto principal donde actuara la libreria, una clase, un movieclip o el stage
+		 * @param functionPreloadComplete Indica la funcion que se devolvera cuando finalice el proceso de precarga, por defecto es null indicando que no hay precarga
+		 */
 		public static function initialize (object:Object, functionPreloadComplete:* = null):void
 		{
 			CodeCraft.mainObject = object;
-			//create rectangle for mask stage
+			//crea el recuadro que hace de mascara para recortar elescenario
 			maskStage.graphics.beginFill(0x000000, 1);
-			maskStage.graphics.drawRect(0, 0, 1024, 640);
+			maskStage.graphics.drawRect(0, 0, _resolutionScreen[0], _resolutionScreen[1]);
 			maskStage.graphics.endFill();
 			
 			mainObject.stage.scaleMode = StageScaleMode.SHOW_ALL;
@@ -71,29 +78,44 @@
 			{
 				mainObject.stop();
 				functionReturnPreload = functionPreloadComplete;
-				preloadAnimation = new Preload();
-				addChild(preloadAnimation);
+				_preloadAnimation = new Preload();
+				addChild(_preloadAnimation);
 				Events.listener(mainObject.loaderInfo,ProgressEvent.PROGRESS, preloadUpdate);
 			}
+			
+			//se cambia el mensaje del menu de contextualizacion
+			var menuItem:ContextMenuItem =  new  ContextMenuItem("Línea de producción Quindío");
+			_menuContext.customItems.push(menuItem);
+			_menuContext.hideBuiltInItems();
+			mainObject.contextMenu = _menuContext;
 		}
 		
+		/**
+		 * Se utiliza para mostrar la animacion de la carga de la barra de progreso
+		 * @param event Object del MouseEvent
+		 */
 		private static function preloadUpdate (event:Event):void
 		{
 			var byteLoaded:Number = mainObject.loaderInfo.bytesLoaded;
 			var byteTotal:Number = mainObject.loaderInfo.bytesTotal;
 			var value:Number = Math.round(100*byteLoaded/byteTotal);
-			preloadAnimation.animationBar.animation.x = (431 * value)/100;
-			preloadAnimation.animationProgressText.progressText.x = (428 * value)/100;
-			preloadAnimation.animationProgressText.progressText.progressText.text = value + "%";
+			_preloadAnimation.animationBar.animation.x = (431 * value)/100;
+			_preloadAnimation.animationProgressText.progressText.x = (428 * value)/100;
+			_preloadAnimation.animationProgressText.progressText.progressText.text = value + "%";
+			//al terminar la carga total del documento fla
 			if(byteLoaded >= byteTotal)
 			{
 				Events.removeListener(mainObject,Event.ENTER_FRAME, preloadUpdate);
 				removeAll();
 				mainObject.gotoAndStop(2);
 				functionReturnPreload();
+				_preloadAnimation = null;
 			}
 		}
 		
+		/**
+		 * 
+		 */
 		public static function getMainObject():* 
 		{
 			if(CodeCraft.mainObject == null) 
@@ -411,14 +433,18 @@
 					mainObject.mask = maskStage;
 				}
 				
-				//verify if menu is loaded in the stage
-				if(menuOptionsLoaded)
+				//verifica si se tiene cargado el menu de opciones para volver a cargarlo y que asi este sobre los demas elementos
+				if(optionsMenuLoaded && mainObject.contains(_optionsMenu))
 				{
-					if (mainObject.contains(menuOptions))
-					{
-						mainObject.removeChild(menuOptions);
-						mainObject.addChild(menuOptions);
-					}
+					mainObject.removeChild(_optionsMenu);
+					mainObject.addChild(_optionsMenu);
+				}
+				
+				//verifica si se tiene cargado el menu principal para volver a cargarlo y que asi este sobre los demas elementos
+				if(mainMenuLoaded && mainObject.contains(_mainMenu))
+				{
+					mainObject.removeChild(_mainMenu);
+					mainObject.addChild(_mainMenu);
 				}
 			}
 			System.pauseForGCIfCollectionImminent(0.75);
@@ -452,10 +478,6 @@
 					}
 				}
 			}
-			else
-			{
-				Debug.print("El object es un valor null para la funcion removeChild");
-			}
 			System.pauseForGCIfCollectionImminent(0.75);
 		}
 		
@@ -466,90 +488,36 @@
 			{ 
 				mainObject.removeChildAt(i - 1); 
 			}
-			if(menuOptionsLoaded)
+			//se verifica si se tiene los menus cargados, esto para que el elemento que se elimina
+			//sea cargado nuevamente
+			if(optionsMenuLoaded)
 			{
-				mainObject.addChild(menuOptions);
+				mainObject.addChild(_optionsMenu);
+			}
+			if(mainMenuLoaded)
+			{
+				mainObject.addChild(_mainMenu);
 			}
 		}
 		
-		public static function addMenu(container:* = null, sound:* = null, soundBackground:* = null, fullScreen:* = null, position:Array = null):void
-		{
-			var enabledTemp:Array = new Array(fullScreen,sound,soundBackground);
-			if(container == null)
-			{
-				container = new MenuOpciones();
-				sound = container.soundButton;
-				fullScreen = container.fullScreenButton;
-				if(enabledTemp[2] == false)
-				{
-					sound.x = 34;
-					fullScreen.x = 91;
-					if(enabledTemp[0] == false)
-					{
-						sound.x = 62;
-					}
-				}
-				soundBackground = container.musicButton;
-			}
-			if(position == null)
-			{
-				position = new Array(mainObject.stage.stageWidth - (container.width + 5), 5);
-			}
-			menuOptions = container;
-			if(fullScreen != null && !(fullScreen is Boolean))
-			{
-				buttonFullScreen = fullScreen;
-				Events.listener(buttonFullScreen,MouseEvent.CLICK,fullScreenMode,true,true);
-				mainObject.stage.addEventListener(FullScreenEvent.FULL_SCREEN, detectFullScreen);
-				mainObject.stage.addEventListener(KeyboardEvent.KEY_DOWN, fullScreenKeyBoard);
-			}
-			else 
-			{
-				buttonFullScreen = new MovieClip();
-			}
-			if(sound != null && !(sound is Boolean))
-			{
-				buttonSound = sound;
-				Events.listener(buttonSound,MouseEvent.CLICK, Audio.stopPresetation,true,true);
-				Button.over(buttonSound,1,null,true);
-			}
-			else 
-			{
-				buttonSound = new MovieClip();
-			}
-			if(soundBackground != null && !(soundBackground is Boolean))
-			{
-				buttonSoundBackground = soundBackground;
-				Events.listener(buttonSoundBackground,MouseEvent.CLICK, Audio.stopBackground,true,true);
-				Button.over(buttonSoundBackground,1,2,true);
-			}
-			else 
-			{
-				buttonSoundBackground = new MovieClip();
-			}
-			addChild(menuOptions,null,position[0],position[1]);
-			menuOptionsLoaded = true;
-			soundActive = true; 
-			
-			var buttonsTemp:Array = new Array(buttonFullScreen, buttonSound,buttonSoundBackground);
-			visibility(buttonsTemp,enabledTemp);
-			
-			if(mainObject.totalFrames > 1)
-			{
-				Events.listener(mainObject,Event.ENTER_FRAME, detectChangeFrameMainObject);
-			}
-		}
 		
-		private static function detectChangeFrameMainObject(event:Event):void 
+		public static function focoActive (object:* = null):void 
 		{
-			if(mainObject.currentFrame != frameCurrent)
+			if(mainObject != null)
 			{
-				frameCurrent = mainObject.currentFrame;
-				if (mainObject.contains(menuOptions)) 
+				if(object == null)
 				{
-					mainObject.removeChild(menuOptions);
-					mainObject.addChild(menuOptions);
+					object = mainObject;
 				}
+				foco = object;
+				mainObject.stage.stageFocusRect = false;
+				mainObject.stage.focus = foco;
+				//agerga listener para seguir cargando el foco
+				mainObject.stage.addEventListener(MouseEvent.CLICK,focoNavigation);
+			}
+			else
+			{
+				Debug.print("CodeCraft initialize no se a ejecutado aun.","CodeCraft.focoNavigation", "Falla CodeCraft ");
 			}
 		}
 		
@@ -569,7 +537,7 @@
 			}
 			else
 			{
-				Validation.error('CodeCraft initialize no se a ejecutado aun');
+				Debug.print("CodeCraft initialize no se a ejecutado aun.","CodeCraft.focoNavigation", "Falla CodeCraft ");
 			}
 		}
 		
@@ -581,69 +549,16 @@
 			return arrayTemp;
 		}
 		
-		/*
-		█████████████████████████████████████████████████████████████████████████████████████████████
-		FULL SCREEN AND BUTTONSOUND
-		█████████████████████████████████████████████████████████████████████████████████████████████
-		*/
 		
-		/**
-		 * FullScreen presentation, embeded in html
-		 * <object> 
-		 *	    ... 
-		 *	    <param name="allowFullScreen" value="true" /> 
-		 *	    <embed ... allowfullscreen="true" /> 
-		 *	</object>
+		
+		
+		/*********************************************************************************************************
 		 * 
-		 */
-		private static function fullScreenMode (event:MouseEvent):void
-		{
-			if(fullScreenActive)
-			{
-				mainObject.stage.displayState = StageDisplayState.NORMAL;
-			}
-			else
-			{
-				mainObject.stage.displayState = StageDisplayState.FULL_SCREEN;
-			}
-			relocatedElement();
-		}
-		
-		private static function fullScreenKeyBoard (event:KeyboardEvent):void 
-		{
-			//La tecla 27 es la tecla de esc
-			if(event.keyCode == 27)
-			{
-				relocatedElement();
-			}
-		}
-		
-		private static function relocatedElement():void
-		{
-			//relocated pop element
-			//menuOptions.x = mainObject.stage.stageWidth - (menuOptions.width + 5);
-		}
-		
-		private static function detectFullScreen (event:FullScreenEvent):void
-		{
-			if(event.fullScreen)
-			{
-				//fullScreen Active
-				fullScreenActive = true;
-			}
-			else 
-			{
-				//fullScreeen inactive
-				fullScreenActive = false;
-			}
-		}
+		 * Contenido para funciones que aplican propiedades a los elementos de la multimedia
+		 * 
+		 * ******************************************************************************************************/
 		
 		
-		/*
-		█████████████████████████████████████████████████████████████████████████████████████████████
-		FUNCIONES DE PROPIEDADES O ATRIBUTOS
-		█████████████████████████████████████████████████████████████████████████████████████████████
-		*/
 		
 		public static function scaleMode(object:*, value:Number = 1):void
 		{
@@ -682,16 +597,20 @@
 			}
 			catch(error:Error)
 			{
-				Validation.error('No se puede aplicar property al elemento o elementos');
+				Debug.print("No se puede aplicar una propiedad al elemento o elementos","CodeCraft.property","Falla CodeCraft ");
 			}
 			
 		}
 		
-		/*
-		█████████████████████████████████████████████████████████████████████████████████████████████
-		FUNCIONES PARA NUMEROS Y ALEATORIO
-		█████████████████████████████████████████████████████████████████████████████████████████████
-		*/
+		
+		
+		/*********************************************************************************************************
+		 * 
+		 * Funciones matematicas de la liberia 
+		 * 
+		 * ******************************************************************************************************/
+		
+		
 		
 		
 		public static function numbers(initial:int = 1, final:int = 10):Array 
