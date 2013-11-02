@@ -138,22 +138,6 @@ package codeCraft.core {
 		
 		public static function remove():void 
 		{
-			//si tiene una funcion para cambio de fotograma la llama
-			if(navigation['functionChangeFrame'] != null)
-			{
-				var functionTemp:Function;
-				if(navigation['functionChangeFrame'] is Array)
-				{
-					//0 indica que es la funcion antes de que cambie el fotograma
-					functionTemp = navigation['functionChangeFrame'][0];
-					functionTemp();						
-				}
-				else
-				{
-					functionTemp = navigation['functionChangeFrame'];
-					functionTemp();	
-				}
-			}
 			removeListenerPresentation();
 			//se verifica si se asigno una paginación para dejarla vacia con el fin de que cuando se llame de nuevo
 			//esta no cargue el clip con la paginación que tenia en la presentación anterior

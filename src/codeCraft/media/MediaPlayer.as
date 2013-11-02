@@ -5,6 +5,7 @@ package codeCraft.media
 	
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
@@ -12,19 +13,24 @@ package codeCraft.media
 	import flash.net.URLRequest;
 	
 	import codeCraft.core.CodeCraft;
-	import codeCraft.display.Button;
+	import codeCraft.debug.Debug;
 	import codeCraft.events.Events;
+	import codeCraft.utils.Timers;
+	
 
 	public class MediaPlayer extends MovieClip
 	{
 		
 		private static var _buttonSound:MovieClip;
-		private static var _container:MovieClip;
+		/* Contenine los botones del menu para realizar la reproduccion, se pone null para cuando se elimine se compare si ya fue cargado o no */
+		private static var _container:MovieClip = null;
 		private static var _buttonPlay:MovieClip;
 		private static var _buttonPrev:MovieClip;
 		private static var _buttonNext:MovieClip;
 		private static var _progressBar:MovieClip;
 		private static var _controlBar:MovieClip;
+		/* Es la funcion que devolvera apenas termine la carga del audio que se esta reproducciendo y pasen dos segundos */
+		private static var _functionReturn:Function;
 		/* Indica si se permite o no la reproduccion de los listener */
 		private static var _statusSound:Boolean = true;
 		private static var _sound:Sound;
@@ -38,7 +44,7 @@ package codeCraft.media
 		/**
 		 * 
 		 */
-		public static function load (buttonSound:MovieClip,containerMediaPlayer:MovieClip, buttonPlay:MovieClip, buttonPrev:MovieClip, buttonNext:MovieClip, progressBar:MovieClip, controlBar:MovieClip, position:Array = null):void 
+		public static function load (buttonSound:MovieClip,containerMediaPlayer:MovieClip, buttonPlay:MovieClip, buttonPrev:MovieClip, buttonNext:MovieClip, progressBar:MovieClip, controlBar:MovieClip, position:Array = null, functionReturn:Function = null):void 
 		{
 			_buttonSound = buttonSound;
 			_container = containerMediaPlayer;
@@ -47,11 +53,15 @@ package codeCraft.media
 			_buttonPrev = buttonPrev;
 			_progressBar = progressBar;
 			_controlBar = controlBar;
-
+			_functionReturn = functionReturn;
 			//verificar si los elementos estan cargados en el stage de lo contrario cargarlos
-			if(!(CodeCraft.getMainObject().contains(_buttonSound)))
+			if(_buttonSound != null)
 			{
-				CodeCraft.addChild(_buttonSound,null,position[0]);
+				if(!(CodeCraft.getMainObject().contains(_buttonSound)))
+				{
+					CodeCraft.addChild(_buttonSound,null,position[0]);
+				}
+				
 			}
 			if(!(CodeCraft.getMainObject().contains(_container)))
 			{
@@ -62,8 +72,42 @@ package codeCraft.media
 			_progressBar.scaleX = 0;
 			//se oculta el contenedor de los botones de multimedia
 			_container.visible = false;
-			Events.listener(_buttonSound,MouseEvent.CLICK, clicSound,true,true);
+			if(_buttonSound != null)
+			{
+				Events.listener(_buttonSound,MouseEvent.CLICK, clicSound,true,true);
+			}
+			else
+			{
+				//reinicia los valores antes de realizar la animacion
+				CodeCraft.property(_container,{alpha:1, scaleY: 1, scaleX: 1});
+				_container.visible = true;
+				TweenMax.from(_container,0.7,{alpha: 0,scaleX: 0, scaleY: 0, ease: Back.easeOut, onComplete: showContainerComplete});
+			}
 		}
+		
+		/**
+		 * Elimina el rreproductor de musica
+		 */
+		public static function remove():void 
+		{
+			_channelSound.stop();
+			//se comprueba que el elemento ya haya sido creado
+			if (_container != null)
+			{
+				Events.removeListener(_buttonSound,MouseEvent.CLICK, clicSound,true);
+				//se verifica si es visible para hacer la animacion que lo oculta
+				if(_container.visible)
+				{
+					TweenMax.to(_container,0.5,{alpha: 0,scaleX: 0, scaleY: 0, ease: Back.easeIn, onComplete: removeComplete});
+				}
+				//si no es visible se llama directamente a la funcion que lo elimin
+				else
+				{
+					removeComplete();
+				}
+			}
+		}
+		
 		
 		/**
 		 * Carga la url que tiene el audio para ser reproducido
@@ -73,7 +117,17 @@ package codeCraft.media
 		{
 			var url:URLRequest = new URLRequest(ruta);
 			_sound = new Sound(url);
+			_sound.addEventListener(IOErrorEvent.IO_ERROR, errorLoadSound);
 		}
+		
+		/**
+		 * Se ejecuta si la url no se puede cargar
+		 */
+		private static function errorLoadSound(event:IOErrorEvent):void 
+		{
+			Debug.print("Verifique la url del audio, al parecer no existe tal ruta.","MediaPlayer.loadSound","Falla CodeCraft ");
+		}
+		
 		
 		/**
 		 * 
@@ -137,7 +191,6 @@ package codeCraft.media
 				Events.listener(_controlBar,MouseEvent.MOUSE_DOWN, barDown,true,false);
 				Events.listener(_buttonPrev,MouseEvent.MOUSE_UP, prevDown,true,false);
 				Events.listener(_buttonNext,MouseEvent.MOUSE_UP, nextDown,true,false);
-				Events.listener(_controlBar,MouseEvent.MOUSE_UP, barDown,true,false);
 				Events.listener(_container,Event.ENTER_FRAME, soundProgress);
 			}
 			else
@@ -148,7 +201,6 @@ package codeCraft.media
 				Events.removeListener(_controlBar,MouseEvent.MOUSE_DOWN, barDown,true);
 				Events.removeListener(_buttonPrev,MouseEvent.MOUSE_UP, prevDown,true);
 				Events.removeListener(_buttonNext,MouseEvent.MOUSE_UP, nextDown,true);
-				Events.removeListener(_controlBar,MouseEvent.MOUSE_UP, barDown,true);
 				Events.removeListener(_container,Event.ENTER_FRAME, soundProgress);
 				_container.visible = false;
 			}
@@ -166,7 +218,7 @@ package codeCraft.media
 			{
 				_currentPosition = _channelSound.position;
 				_channelSound.stop();
-				_buttonPlay.gotoAndStop("play");	
+				_buttonPlay.gotoAndStop("play");
 			}
 		}
 		
@@ -230,21 +282,34 @@ package codeCraft.media
 				_volumen = 0;
 				Events.removeListener(_container,Event.ENTER_FRAME, soundProgress);
 				Events.listener(_controlBar,Event.ENTER_FRAME, soundScrub);
+				Events.listener(CodeCraft.getMainObject().stage,MouseEvent.MOUSE_UP, barDown,true);
 			}
 			else 
 			{
 				_volumen = 1;
 				Events.listener(_container,Event.ENTER_FRAME, soundProgress);
 				Events.removeListener(_controlBar,Event.ENTER_FRAME, soundScrub);
+				Events.removeListener(CodeCraft.getMainObject().stage,MouseEvent.MOUSE_UP, barDown,true);
 			}
+			changeVolumen();
+			//al presionar la barra se inicia nuevamente el audio
+			_buttonPlay.gotoAndStop("pause");
 		}
 		
-		private static function soundScrub(event:Event):void {
+		/**
+		 * Se ejecuta muentras se este moviendo el mouse sobre la barra para controlar el progreso
+		 * del audio
+		 * @param event Object de Event
+		 */
+		private static function soundScrub(event:Event):void 
+		{
 			var soundDist:Number = (CodeCraft.getMainObject().mouseX - _container.x - _controlBar.x) / _controlBar.width;
-			if(soundDist < 0){
+			if(soundDist < 0)
+			{
 				soundDist = 0;
 			}
-			if(soundDist > 1){
+			if(soundDist > 1)
+			{
 				soundDist = 1;
 			}
 			_channelSound.stop();
@@ -253,6 +318,11 @@ package codeCraft.media
 			changeVolumen();
 		}
 		
+		/**
+		 * Se ejecuta mientras essta sonando el audio y su objetivo es hacer que la barra se mueva
+		 * para dar el efecto de que el audio esta cargando
+		 * @param event Object del MouseEvent
+		 */
 		private static function soundProgress(event:Event):void 
 		{    
 			var loadTime:Number = _sound.bytesLoaded / _sound.bytesTotal;
@@ -263,15 +333,51 @@ package codeCraft.media
 			_duration = estimatedLength;
 		}
 		
+		/**
+		 * Se ejecuta para volver el boton de volumen a su forma original despues de terminar el audio
+		 */
 		private static function soundComplete (event:Event):void 
 		{
+			Events.removeListener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
 			_buttonPlay.gotoAndStop("play");
+			//se verifica  si tiene una funcion que devolver
+			if(_functionReturn != null)
+			{
+				Timers.timer(2,_functionReturn);
+			}
 		}
 		
+		/**
+		 * 
+		 */
 		private static function changeVolumen ():void 
 		{
+			Events.removeListener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
 			_soundTransform.volume = _volumen;
 			_channelSound.soundTransform = _soundTransform;
+			Events.listener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
+		}
+		
+		/**
+		 * Elimina los listener y limpia las variables para eliminar todo por completo
+		 */
+		private static function removeComplete():void
+		{
+			Events.removeListener(_buttonPlay,MouseEvent.CLICK, clicPlay,true);
+			Events.removeListener(_buttonPrev,MouseEvent.MOUSE_DOWN, prevDown,true);
+			Events.removeListener(_buttonNext,MouseEvent.MOUSE_DOWN, nextDown,true);
+			Events.removeListener(_controlBar,MouseEvent.MOUSE_DOWN, barDown,true);
+			Events.removeListener(_buttonPrev,MouseEvent.MOUSE_UP, prevDown,true);
+			Events.removeListener(_buttonNext,MouseEvent.MOUSE_UP, nextDown,true);
+			Events.removeListener(_controlBar,MouseEvent.MOUSE_UP, barDown,true);
+			Events.removeListener(_container,Event.ENTER_FRAME, soundProgress);
+			CodeCraft.removeChild(_container);
+			_buttonNext = null;
+			_buttonPlay = null;
+			_buttonPrev = null;
+			_buttonSound = null;
+			_container = null;
+			_sound = null;
 		}
 		
 	}

@@ -23,7 +23,8 @@ package codeCraft.media
 	public class Record
 	{
 		
-		private static var _container:MovieClip;
+		/* Almacenara los botones para grabar y reproducir, se da el valor null para indicar que no se a cargado */
+		private static var _container:MovieClip = null;
 		private static var _buttonRecord:MovieClip;
 		private static var _buttonPlay:MovieClip;
 		private static var _buttonMicrophone:MovieClip;
@@ -79,6 +80,34 @@ package codeCraft.media
 			Events.listener(_buttonMicrophone,MouseEvent.CLICK, clicMicrophone,true,true);
 		}
 		
+		/**
+		 * Elimina el elemento y las funciones que se encargar de realizar la grabación
+		 */
+		public static function remove ():void 
+		{
+			//se verifica si elemento ya fue creado para poder eliminarlo
+			if (_container != null)
+			{
+				Events.removeListener(_buttonMicrophone,MouseEvent.CLICK, clicMicrophone,true);
+				//se verifica si el elemento esta actualmente visible para hacer la animacion de que se oculta
+				if(_container.visible)
+				{
+					stopPlay();
+					stopRecord();
+					TweenMax.to(_container,0.5,{alpha: 0,scaleX: 0, scaleY: 0, ease: Back.easeIn, onComplete: removeComplete});
+				}
+				//si el elemento no esta visible se procede a llamar a la funcion para eliminar directamente
+				else
+				{
+					removeComplete();
+				}
+			}
+		}
+		
+		/**
+		 * Devuelve el estado del microfono, true para indicar que se autorizo el uso, false para indicar
+		 * que no se autirizo el uso del microfono y se encuentra desabilitado
+		 */
 		public static function getStatusMicrophone():Boolean
 		{
 			return _statusMicrophone;
@@ -289,6 +318,20 @@ package codeCraft.media
 			_buttonRecord.gotoAndStop("grabar");
 			//como termina la grabacion se reactiva el statusPlayer
 			MediaPlayer.statusSound(true);
+		}
+		
+		/**
+		 * Elimina el container del menu del escenario  quita todos los listener que se activaron
+		 */
+		private static function removeComplete ():void 
+		{
+			Events.removeListener(_buttonPlay,MouseEvent.CLICK, clicPlay,true);
+			Events.removeListener(_buttonRecord,MouseEvent.CLICK, clicRecord,true);
+			CodeCraft.removeChild(_container);
+			_buttonMicrophone = null;
+			_buttonPlay = null;
+			_buttonRecord = null;
+			_container = null;
 		}
 		
 	}

@@ -8,6 +8,7 @@
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.ProgressEvent;
+	import flash.system.Security;
 	import flash.system.System;
 	import flash.text.TextField;
 	import flash.ui.ContextMenu;
@@ -31,8 +32,8 @@
 		private static var maskStage:Shape = new Shape();
 		
 		/* Variables utilizadas para el manejo de los menus de la clase Menu */
-		private static var _mainMenu:MovieClip = new MovieClip;
-		private static var _optionsMenu:MovieClip = new MovieClip;
+		public static var mainMenu:MovieClip = new MovieClip;
+		public static var optionsMenu:MovieClip = new MovieClip;
 		public static var mainMenuLoaded:Boolean = false;
 		public static var optionsMenuLoaded:Boolean = false;
 		
@@ -88,6 +89,9 @@
 			_menuContext.customItems.push(menuItem);
 			_menuContext.hideBuiltInItems();
 			mainObject.contextMenu = _menuContext;
+			
+			//se habilita el dominio de seguridad externo para que se pueda accedera los demas elementos
+			Security.allowDomain("*");
 		}
 		
 		/**
@@ -96,20 +100,27 @@
 		 */
 		private static function preloadUpdate (event:Event):void
 		{
-			var byteLoaded:Number = mainObject.loaderInfo.bytesLoaded;
-			var byteTotal:Number = mainObject.loaderInfo.bytesTotal;
-			var value:Number = Math.round(100*byteLoaded/byteTotal);
-			_preloadAnimation.animationBar.animation.x = (431 * value)/100;
-			_preloadAnimation.animationProgressText.progressText.x = (428 * value)/100;
-			_preloadAnimation.animationProgressText.progressText.progressText.text = value + "%";
-			//al terminar la carga total del documento fla
-			if(byteLoaded >= byteTotal)
+			try
 			{
-				Events.removeListener(mainObject,Event.ENTER_FRAME, preloadUpdate);
-				removeAll();
-				mainObject.gotoAndStop(2);
-				functionReturnPreload();
-				_preloadAnimation = null;
+				var byteLoaded:Number = mainObject.loaderInfo.bytesLoaded;
+				var byteTotal:Number = mainObject.loaderInfo.bytesTotal;
+				var value:Number = Math.round(100*byteLoaded/byteTotal);
+				_preloadAnimation.animationBar.animation.x = (431 * value)/100;
+				_preloadAnimation.animationProgressText.progressText.x = (428 * value)/100;
+				_preloadAnimation.animationProgressText.progressText.progressText.text = value + "%";
+				//al terminar la carga total del documento fla
+				if(byteLoaded >= byteTotal)
+				{
+					Events.removeListener(mainObject,Event.ENTER_FRAME, preloadUpdate);
+					removeAll();
+					mainObject.gotoAndStop(2);
+					functionReturnPreload();
+					_preloadAnimation = null;
+				}
+			}
+			catch(e:Error)
+			{
+				Debug.print("Error al momento de realizar la precarga del contenido.","CodeCraft.preloadUpdate","Error CodCraft ");
 			}
 		}
 		
@@ -185,7 +196,7 @@
 								object[i].gotoAndStop(frame[i]);
 							}
 						} 
-						else if (frame == 0) 
+						else if (frame is Number && frame == 0) 
 						{
 							for (var j:uint = 0; j < object.length; j++) 
 							{
@@ -434,17 +445,17 @@
 				}
 				
 				//verifica si se tiene cargado el menu de opciones para volver a cargarlo y que asi este sobre los demas elementos
-				if(optionsMenuLoaded && mainObject.contains(_optionsMenu))
+				if(optionsMenuLoaded && mainObject.contains(optionsMenu))
 				{
-					mainObject.removeChild(_optionsMenu);
-					mainObject.addChild(_optionsMenu);
+					mainObject.removeChild(optionsMenu);
+					mainObject.addChild(optionsMenu);
 				}
 				
 				//verifica si se tiene cargado el menu principal para volver a cargarlo y que asi este sobre los demas elementos
-				if(mainMenuLoaded && mainObject.contains(_mainMenu))
+				if(mainMenuLoaded && mainObject.contains(mainMenu))
 				{
-					mainObject.removeChild(_mainMenu);
-					mainObject.addChild(_mainMenu);
+					mainObject.removeChild(mainMenu);
+					mainObject.addChild(mainMenu);
 				}
 			}
 			System.pauseForGCIfCollectionImminent(0.75);
@@ -492,11 +503,11 @@
 			//sea cargado nuevamente
 			if(optionsMenuLoaded)
 			{
-				mainObject.addChild(_optionsMenu);
+				mainObject.addChild(optionsMenu);
 			}
 			if(mainMenuLoaded)
 			{
-				mainObject.addChild(_mainMenu);
+				mainObject.addChild(mainMenu);
 			}
 		}
 		

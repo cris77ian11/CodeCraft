@@ -119,26 +119,73 @@ package codeCraft.utils {
 		}
 		
 		//desordena un array
-		public static function random(array:Array):Array {
+		public static function random(array:Array):Array 
+		{
 			var arrayTemp:Array = new Array(); 
-			while (array.length > 0) {
-				var _numero:Number = Math.floor(Math.random() * array.length);
-				arrayTemp.push(array[_numero]); 
-				array.splice(_numero, 1);
+			var arrayOrigin:Array = new Array();
+			for(var i:uint = 0; i < array.length; i++)
+			{
+				arrayOrigin.push(array[i]);
+			}
+			while (arrayOrigin.length > 0) 
+			{
+				var _numero:Number = Math.floor(Math.random() * arrayOrigin.length);
+				arrayTemp.push(arrayOrigin[_numero]); 
+				arrayOrigin.splice(_numero, 1);
 			}
 			return arrayTemp;
 		}
 		
-		//fill retorna un array con una cantidad de campos indicada y con
-		public static function fill (value:*, sizeArray:* = 1):Array {
-			if(sizeArray == undefined || sizeArray == null){
-				sizeArray = 1;
+		/**
+		 * LLena un array con los valores indicados, se puede asignar un espacio total del arreglo, tambien se  peude indicar
+		 * desde que espacio del array quiere iniciar la carga de elementos y hasta que espacio, por defecto se llenara 
+		 * todo si no se modifican los valores
+		 * @param value Valor de cualquier tipo con el que se quiera llenar el array
+		 * @param sizeArray Tamano maximo de elemento que tiene o va a tener el array
+		 * @param positionInitial Valor numerico que indica desde que posicion del array se va a iniciar el llenado
+		 * @param positionFinal Valor numerico que indica hasta donde se va a llenar el arreglo
+		 * @param valueNull Valor que se almacena en los campos del array que no se llenaran con el valor value
+		 */
+		public static function fill (value:*, sizeArray:int = 1, positionInitial:int = 0, positionFinal:int = 0, valueNull:* = null):Array 
+		{
+			if (positionFinal == 0 || positionFinal < positionInitial)
+			{
+				positionFinal = sizeArray;
 			}
 			var arrayTemp:Array = new Array();
-			for (var i:uint = 0; i < sizeArray; i++){
-				arrayTemp.push(value);	
+			for (var i:int = 0; i < sizeArray; i++)
+			{
+				if(i >= positionInitial && i < positionFinal)
+				{
+					arrayTemp.push(value);
+				}
+				else
+				{
+					arrayTemp.push(valueNull);
+				}
+				
 			}
 			return arrayTemp;
+		}
+		
+		/**
+		 * Se encarga de recorrer el array y verificar si el elemento que se pasa como value se encuentra en 
+		 * el array por completo, es decir si se quiere saber si un array esta lleno todos sus campos de true
+		 * se utiliza la funcion, de estar lleno devolvera true, de tener aunque sea un campo con otro valor
+		 * devolvera false.
+		 * @param array Array al que se desea comprobar
+		 * @param value Valor de cualquier tipo el que se desea verificar si esta cargado el array
+		 */
+		public static function verifyFill(array:Array, value:*):Boolean
+		{
+			for (var i:uint = 0; i < array.length; i++)
+			{
+				if(array[i] != value)
+				{
+					return false;
+				}
+			}
+			return true;
 		}
 		
 	}

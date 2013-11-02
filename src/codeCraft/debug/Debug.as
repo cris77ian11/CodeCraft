@@ -81,7 +81,7 @@ package codeCraft.debug{
 			}
 			catch(error:Error)
 			{
-				trace("Error CodeCraft Debug.print: Un valor que se trata de imprimir no es admitido.");
+				trace("Error CodeCraft Debug.print: Un valor que se trata de imprimir no es admitido, puede tener algun valor null.");
 			}
 				
 		}

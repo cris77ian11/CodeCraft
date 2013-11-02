@@ -57,8 +57,9 @@ package codeCraft.display
 			if(!(CodeCraft.getMainObject().contains(_container)) && position != null)
 			{
 				CodeCraft.addChild(_container,null,_position[0],_position[1]);
-				CodeCraft.mainMenuLoaded = true;
 			}
+			CodeCraft.mainMenu = _container;
+			CodeCraft.mainMenuLoaded = true;
 			loadButtons();
 		}
 		
@@ -159,6 +160,7 @@ package codeCraft.display
 			}
 			
 			CodeCraft.addChild(_containerMenuOptions,null,_positionMenuOptions);
+			CodeCraft.optionsMenu = _containerMenuOptions;
 			CodeCraft.optionsMenuLoaded = true;
 		}
 		

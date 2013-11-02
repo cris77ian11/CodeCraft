@@ -26,10 +26,9 @@ package codeCraft.text{
 					{
 						for (var n:uint = 0; n < object[i].numChildren; n++) 
 						{
-							//Verify children is TextField
+							
 							if (nivel == 1)
 							{
-								Debug.print(object[i].getChildAt(n));
 								if (object[i].getChildAt(n) is TextField || object[i].getChildAt(n) is StaticText) 
 								{
 									textTemp = object[i].getChildAt(n);
@@ -57,11 +56,16 @@ package codeCraft.text{
 			}
 			else 
 			{
-				if (object is TextField || object is StaticText) {
+				if (object is TextField || object is StaticText) 
+				{
 					textTemp = object;
-				}else {
-					for (var j:uint = 0; j < object.numChildren; j++) {
-						if (object.getChildAt(j) is TextField || object.getChildAt(j) is StaticText) {
+				}
+				else 
+				{
+					for (var j:uint = 0; j < object.numChildren; j++)
+					{
+						if (object.getChildAt(j) is TextField || object.getChildAt(j) is StaticText) 
+						{
 							textTemp = object.getChildAt(j);
 						}
 					}
@@ -71,15 +75,19 @@ package codeCraft.text{
 		}
 		
 		private static function loadText (objectText:*, valueText:*):void {
-			objectText.wordWrap = true;
-			objectText.selectable = false; 
+			//objectText.wordWrap = true;
+			//objectText.selectable = false; 
 			var textLoad:String;
-			if(valueText is Array){
+			if(valueText is Array)
+			{
 				textLoad = valueText[numberText];	
-			}else {
+			}
+			else 
+			{
 				textLoad = valueText;
 			}
-			if(objectText is TextField || objectText is StaticText){
+			if(objectText is TextField || objectText is StaticText)
+			{
 				objectText.text = textLoad;
 			}
 		}

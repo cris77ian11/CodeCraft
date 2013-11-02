@@ -1,6 +1,7 @@
 package codeCraft.media 
 {
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
@@ -56,11 +57,12 @@ package codeCraft.media
 			if(_functionReturnComplete == null)
 			{
 				_channelPresentation.stop();
-				_channelBackgroundActive = false;
+				_channelPresentationActive = false;
 			}
 			if (_volumenPresentation == 1) 
 			{
 				//Silencia
+				_positionSoundPresentation = _channelPresentation.position;
 				event.currentTarget.gotoAndStop('silencio');
 				Button.removeOver(event.currentTarget,1);
 				_volumenPresentation = 0;
@@ -81,6 +83,15 @@ package codeCraft.media
 			_soundTransformPresentation = _channelPresentation.soundTransform;
 			_soundTransformPresentation.volume = _volumenPresentation;
 			_channelPresentation.soundTransform = _soundTransformPresentation;
+		}
+		
+		/**
+		 * Cambia el volumen del canal de audio de la presentacion
+		 * @param value Numero int entre 1 y 0 para la asignacion del volumen del canal de presentacion
+		 */
+		public static function setVolumenPresentation (value:int = 0):void 
+		{
+			_volumenPresentation = value;
 		}
 		
 		/**
@@ -230,6 +241,7 @@ package codeCraft.media
 					{
 						_url = new URLRequest(ruta);
 						_audio = new Sound(_url);
+						_audio.addEventListener(IOErrorEvent.IO_ERROR, errorLoadSound);
 					}
 					else 
 					{
@@ -385,6 +397,12 @@ package codeCraft.media
 				_functionReturnComplete();
 				_functionReturnComplete = null;
 			}
+		}
+		
+		
+		private static function errorLoadSound(event:IOErrorEvent):void 
+		{
+			Debug.print("Verifique la url del audio, al parecer no existe tal ruta.","Audio.playAudio","Falla CodeCraft ");
 		}
 		
 		

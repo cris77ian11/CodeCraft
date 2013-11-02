@@ -1,8 +1,9 @@
 package codeCraft.events {
 	
-	import codeCraft.display.Button;
+	import flash.display.MovieClip;
+	import flash.events.MouseEvent;
 	
-	import flash.events.*;
+	import codeCraft.display.Button;
 	
 	public class Events {
 	
@@ -15,9 +16,16 @@ package codeCraft.events {
 				{
 					for (var i:uint = 0; i < object.length; i++) 
 					{
-						if(object[i] != null && object[i] != undefined)
+						if(object[i] is Array)
 						{
-							object[i].addEventListener(accion, method);
+						 	listener(object[i],accion,method,modeButton,over);	
+						}
+						else
+						{
+							if(object[i] != null && object[i] != undefined)
+							{
+								object[i].addEventListener(accion, method);
+							}
 						}
 					}
 					clipTemp = object[0];
@@ -41,7 +49,7 @@ package codeCraft.events {
 		
 		public static function removeListener(object:*, accion:*, method:*, modeButton:Boolean = true):void 
 		{
-			if(object != null || object != undefined)
+			if(object != null || object != undefined  && (object is MovieClip || object is Object))
 			{
 				var clipTemp:*;
 				if(object is Array)
@@ -62,9 +70,16 @@ package codeCraft.events {
 				{
 					for (var i:uint = 0; i < object.length; i++) 
 					{
-						if(object[i].hasEventListener (accion))
+						if(object[i] is Array)
 						{
-							object[i].removeEventListener (accion, method);
+							removeListener(object[i],accion,method,modeButton);
+						}
+						else
+						{
+							if(object[i].hasEventListener (accion))
+							{
+								object[i].removeEventListener (accion, method);
+							}	
 						}
 					}
 				} 
