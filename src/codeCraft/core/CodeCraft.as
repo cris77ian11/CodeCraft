@@ -193,25 +193,46 @@
 						{
 							for (var i:uint = 0; i < object.length; i++)
 							{
-								object[i].gotoAndStop(frame[i]);
+								if(object[i] is Array)
+								{
+									stopFrame(object[i],frame[i],frameInitial);
+								}
+								else
+								{
+									object[i].gotoAndStop(frame[i]);	
+								}
 							}
 						} 
 						else if (frame is Number && frame == 0) 
 						{
 							for (var j:uint = 0; j < object.length; j++) 
 							{
-								if(frameInitial == object[j].totalFrames)
+								if(object[j] is Array)
 								{
-									frameInitial -= (j + 1);
+									stopFrame(object[j],frame,frameInitial);
 								}
-								object[j].gotoAndStop(frameInitial + j);
+								else
+								{
+									if(frameInitial == object[j].totalFrames)
+									{
+										frameInitial -= (j + 1);
+									}
+									object[j].gotoAndStop(frameInitial + j);	
+								}
 							}
 						} 
 						else 
 						{
 							for (var k:uint = 0; k < object.length; k++) 
 							{
-								object[k].gotoAndStop(frame);
+								if(object[k] is Array)
+								{
+									stopFrame(object[k],frame,frameInitial);
+								}
+								else
+								{
+									object[k].gotoAndStop(frame);	
+								}
 							}
 						}
 					} 
@@ -271,7 +292,7 @@
 
 		//Funciones para la carga de elementos al objeto padre
 
-		public static function addChild(object:*, container:* = null, posX:* = 0, posY:Number = 0, eje:String = 'y', espacio:Number = 10, columnas:Number = NaN, espacioColumna:Number = 10):void
+		public static function addChild(object:*, container:* = null, posX:* = 0, posY:Number = 0, eje:String = 'y', espacio:Number = 10, columnas:Number = NaN, espacioColumna:Number = 20):void
 		{
 			var signo:String = '+';
 			if(eje.length > 1)
@@ -281,7 +302,7 @@
 			}
 			if(CodeCraft.mainObject == null)
 			{
-				Validation.error('CodeCraft initialize no se a ejecutado aun');
+				Debug.print("CodeCraft initialize no se a ejecutado aun.","CodeCraft.addChild","Error CodeCraft ");
 			}
 			else
 			{
@@ -339,31 +360,54 @@
 							}
 							else
 							{
-								if(signo == '-')
+								//se verifica el sentido de la carga del elemento si es el eje x entonces el 
+								//espacio entre los elementos esta medido por su largo, de ser el eje y
+								//el espacio esta medido por su ancho
+								if(eje == "x")
+								{
+									_distanciaEspacio = object[i].width + espacio;
+								}
+								else
 								{
 									_distanciaEspacio = object[i].height + espacio;
+								}
+								//se verifica el sentido que se quiere para cargar los elementos, por defecto cargaran en x
+								//de izquierda a derecha, y en y de arriba a abajo si se pone el signo menos ambos cargaran
+								//en el lado contrario
+								if(signo == '-')
+								{
 									_posY1[i] = object[i - 1].y - _distanciaEspacio;
 									_posX2[i] = object[i - 1].x - _distanciaEspacio;
 								}
 								else
 								{
-									_distanciaEspacio = object[i].height + espacio;
 									_posY1[i] = object[i - 1].y + _distanciaEspacio;
 									_posX2[i] = object[i - 1].x + _distanciaEspacio;
 								}
 							}
 							if (i == columnas) 
 							{
-								//se posiciona de nuevo los elementos
+								//se verifica el sentido de la carga del elemento si es el eje x entonces el 
+								//espacio entre los elementos esta medido por su largo, de ser el eje y
+								//el espacio esta medido por su ancho
+								if(eje == "x")
+								{
+									_distanciaEspacio = object[i - 1].width + espacioColumna ;
+								}
+								else
+								{
+									_distanciaEspacio = object[i - 1].height + espacioColumna;
+								}
+								//se verifica el sentido que se quiere para cargar los elementos, por defecto cargaran en x
+								//de izquierda a derecha, y en y de arriba a abajo si se pone el signo menos ambos cargaran
+								//en el lado contrario
 								if(signo == '-')
 								{
-									_distanciaColumna = object[i - 1].width + 10 + espacioColumna;
 									_posX1[i] = object[i - 1].x - _distanciaColumna; 
 									_posY2[i] = object[i - 1].y - _distanciaColumna;
 								}
 								else
 								{
-									_distanciaColumna = object[i - 1].width + 10 + espacioColumna;
 									_posX1[i] = object[i - 1].x + _distanciaColumna; 
 									_posY2[i] = object[i - 1].y + _distanciaColumna;
 								}
@@ -382,6 +426,7 @@
 									_posY2[i] = _posY2[i - 1];
 								}
 							}
+							//Despues de capturar las pocisiones de las los elementos se cargan aqui
 							if (eje == 'y') 
 							{
 								object[i].x = _posX1[i];
@@ -392,7 +437,6 @@
 								object[i].x = _posX2[i];
 								object[i].y = _posY2[i];
 							}
-							//limpiar el valor de la variable
 						}
 					}
 					object = null;
@@ -588,22 +632,29 @@
 		{
 			try 
 			{
-				if(object is Array)
+				if(object != null)
 				{
-					for (var i:uint = 0; i < object.length; i++)
+					if(object is Array)
 					{
-						for (var keyOne:Object  in value)
+						for (var i:uint = 0; i < object.length; i++)
 						{
-							object[i][keyOne] = value[keyOne];	
+							for (var keyOne:Object  in value)
+							{
+								object[i][keyOne] = value[keyOne];	
+							}
+						}
+					}
+					else
+					{
+						for (var keyTwo:Object in value)
+						{
+							object[keyTwo] = value[keyTwo];
 						}
 					}
 				}
-				else
+				else 
 				{
-					for (var keyTwo:Object in value)
-					{
-						object[keyTwo] = value[keyTwo];
-					}
+					Debug.print("El elemento object a aplicar las propiedades tiene el valor null.","CodeCraft.property","Falla CodeCraft ");
 				}
 			}
 			catch(error:Error)

@@ -9,6 +9,8 @@ package codeCraft.text{
 	public class Texts {
 		
 		private static var numberText:int = 0;
+		/* almacena la posicion actual del texto para cargar en el array */
+		
 
 		public static function load (object:*, textValue:*, nivel:int = 1):void 
 		{
@@ -16,42 +18,49 @@ package codeCraft.text{
 			numberText = 0;
 			if (object is Array) 
 			{
-				for (var i:uint = 0; i < object.length; i++) 
+				for (var i:int = 0; i < object.length; i++) 
 				{ 
-					if (object[i] is TextField || object[i] is StaticText) 
+					if(object[i] is Array)
 					{
-						textTemp = object[i];
+						load(object[i],textValue[i]);
 					}
-					else 
+					else
 					{
-						for (var n:uint = 0; n < object[i].numChildren; n++) 
+						if (object[i] is TextField || object[i] is StaticText) 
 						{
-							
-							if (nivel == 1)
+							textTemp = object[i];
+						}
+						else 
+						{
+							for (var n:uint = 0; n < object[i].numChildren; n++) 
 							{
-								if (object[i].getChildAt(n) is TextField || object[i].getChildAt(n) is StaticText) 
+								
+								if (nivel == 1)
 								{
-									textTemp = object[i].getChildAt(n);
-								}
-							}
-							else 
-							{
-								var objectTemp:* = object[i].getChildAt(n);
-								if(objectTemp is MovieClip)
-								{
-									for (var l:uint = 0; l < objectTemp.numChildren; l++) 
+									if (object[i].getChildAt(n) is TextField || object[i].getChildAt(n) is StaticText) 
 									{
-										if (objectTemp.getChildAt(l) is TextField || objectTemp.getChildAt(l) is StaticText) 
+										textTemp = object[i].getChildAt(n);
+									}
+								}
+								else 
+								{
+									var objectTemp:* = object[i].getChildAt(n);
+									if(objectTemp is MovieClip)
+									{
+										for (var l:uint = 0; l < objectTemp.numChildren; l++) 
 										{
-											textTemp = objectTemp.getChildAt(l);
+											if (objectTemp.getChildAt(l) is TextField || objectTemp.getChildAt(l) is StaticText) 
+											{
+												textTemp = objectTemp.getChildAt(l);
+											}
 										}
 									}
 								}
 							}
+							loadText(textTemp,textValue);
+							numberText++;
 						}
 					}
-					loadText(textTemp,textValue);
-					numberText++;
 				}
 			}
 			else 

@@ -57,13 +57,20 @@ package codeCraft.debug{
 					trace(type + name + ': ARRAY');
 					for (var i:int = 0; i < object.length; i++) 
 					{
-						if(object[i] is String || object[i] is Number || object[i] is Boolean)
+						if(object[i] is Array)
 						{
-							trace(i + ': ' + object[i]);
+							print(object[i]," __ Array " + i,type);
 						}
-						else 
+						else
 						{
-							trace(i + ': ' + object[i] + ' - name: ' + object[i].name);
+							if(object[i] is String || object[i] is Number || object[i] is Boolean)
+							{
+								trace(i + ': ' + object[i]);
+							}
+							else 
+							{
+								trace(i + ': ' + object[i] + ' - name: ' + object[i].name);
+							}
 						}
 					}
 				}

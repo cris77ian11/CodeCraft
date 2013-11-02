@@ -122,16 +122,17 @@ package codeCraft.utils {
 		public static function random(array:Array):Array 
 		{
 			var arrayTemp:Array = new Array(); 
-			var arrayOrigin:Array = new Array();
-			for(var i:uint = 0; i < array.length; i++)
+			var arrayCopia:Array = clone(array);
+			while (arrayCopia.length > 0) 
 			{
-				arrayOrigin.push(array[i]);
-			}
-			while (arrayOrigin.length > 0) 
-			{
-				var _numero:Number = Math.floor(Math.random() * arrayOrigin.length);
-				arrayTemp.push(arrayOrigin[_numero]); 
-				arrayOrigin.splice(_numero, 1);
+				var _numero:Number = Math.floor(Math.random() * arrayCopia.length);
+				if(arrayCopia[_numero] is Array)
+				{
+					arrayCopia[_numero] = random(arrayCopia[_numero]);
+					_numero = 0;
+				}
+				arrayTemp.push(arrayCopia[_numero]); 
+				arrayCopia.splice(_numero, 1);	
 			}
 			return arrayTemp;
 		}
@@ -186,6 +187,24 @@ package codeCraft.utils {
 				}
 			}
 			return true;
+		}
+		
+		
+		/**
+		 * Clona un array y devuelve la copia exacta del mismo, con la diferencia de que este se puede modificar
+		 * y las acciones aplicadas a este no alteran al array de origen. 
+		 * @param array
+		 * @return 
+		 * 
+		 */
+		public static function clone(array:Array):Array
+		{
+			var arrayCopia:Array = new Array();
+			for(var i:uint = 0; i < array.length; i++)
+			{
+				arrayCopia.push(array[i]);
+			}
+			return arrayCopia;
 		}
 		
 	}
