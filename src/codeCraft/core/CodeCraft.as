@@ -292,7 +292,7 @@
 
 		//Funciones para la carga de elementos al objeto padre
 
-		public static function addChild(object:*, container:* = null, posX:* = 0, posY:Number = 0, eje:String = 'y', espacio:Number = 10, columnas:Number = NaN, espacioColumna:Number = 20):void
+		public static function addChild(object:*, container:* = null, posX:* = 0, posY:Number = 0, eje:String = 'y', espacio:Number = 10, columnas:Number = NaN, espacioColumna:Number = 10):void
 		{
 			var signo:String = '+';
 			if(eje.length > 1)
@@ -392,11 +392,11 @@
 								//el espacio esta medido por su ancho
 								if(eje == "x")
 								{
-									_distanciaEspacio = object[i - 1].width + espacioColumna ;
+									_distanciaColumna = object[i - 1].height + espacioColumna ;
 								}
 								else
 								{
-									_distanciaEspacio = object[i - 1].height + espacioColumna;
+									_distanciaColumna = object[i - 1].width + espacioColumna;
 								}
 								//se verifica el sentido que se quiere para cargar los elementos, por defecto cargaran en x
 								//de izquierda a derecha, y en y de arriba a abajo si se pone el signo menos ambos cargaran
@@ -422,8 +422,8 @@
 								} 
 								else
 								{
-									_posX1[i] = _posX1[i - 1];
-									_posY2[i] = _posY2[i - 1];
+									_posX1[i] = object[i - 1].x;
+									_posY2[i] = object[i - 1].y;
 								}
 							}
 							//Despues de capturar las pocisiones de las los elementos se cargan aqui

@@ -59,9 +59,12 @@ package codeCraft.media
 			_microphone = Microphone.getMicrophone();
 			
 			//verificar si los elementos estan cargados en el stage de lo contrario cargarlos
-			if(!(CodeCraft.getMainObject().contains(_buttonMicrophone)))
+			if(_buttonMicrophone != null)
 			{
-				CodeCraft.addChild(_buttonMicrophone,null,position[0]);
+				if(!(CodeCraft.getMainObject().contains(_buttonMicrophone)))
+				{
+					CodeCraft.addChild(_buttonMicrophone,null,position[0]);
+				}	
 			}
 			if(!(CodeCraft.getMainObject().contains(_container)))
 			{
@@ -70,14 +73,26 @@ package codeCraft.media
 			//se detiene el boton de play y grabar y agrea alpha para el efecto de desactivar el boton de play
 			_buttonRecord.gotoAndStop("grabar");
 			_buttonPlay.gotoAndStop("play");
-			//se oculta el contenedor de los botones de grabacion
-			_container.visible = false;
+			_buttonPlay.alpha = 0.2;
 			//se carga un listener que detecta si se permitio o no el uso del microfono asi como su existencia
 			_microphone.addEventListener(StatusEvent.STATUS, statusMicrophone);
 			_statusMicrophone = true;
-			//se inicia el microfono desactivado por defecto
-			CodeCraft.property(_buttonMicrophone,{alpha: 1});
-			Events.listener(_buttonMicrophone,MouseEvent.CLICK, clicMicrophone,true,true);
+			if(_buttonMicrophone == null)
+			{
+				//reinicia los valores antes de realizar la animacion
+				CodeCraft.property(_container,{alpha:1, scaleY: 1, scaleX: 1});
+				_container.visible = true;
+				TweenMax.from(_container,0.7,{alpha: 0,scaleX: 0, scaleY: 0, ease: Back.easeOut});
+				Events.listener(_buttonRecord,MouseEvent.CLICK, clicRecord,true,true);
+			}
+			else
+			{
+				//se oculta el contenedor de los botones de grabacion
+				_container.visible = false;
+				//se inicia el microfono desactivado por defecto
+				CodeCraft.property(_buttonMicrophone,{alpha: 1});
+				Events.listener(_buttonMicrophone,MouseEvent.CLICK, clicMicrophone,true,true);
+			}
 		}
 		
 		/**
@@ -249,6 +264,8 @@ package codeCraft.media
 		private static function playSoundComplete(event:Event):void 
 		{
 			stopPlay();
+			//se restaura el audio de fondo
+			Audio.setVolumenBackground(1);
 		}
 		
 		/**
@@ -294,6 +311,8 @@ package codeCraft.media
 			_soundChannel.stop()
 			Events.removeListener(_soundChannel, Event.SOUND_COMPLETE,playSoundComplete);
 			_buttonPlay.gotoAndStop("play");
+			//se restaura el audio de fondo
+			Audio.setVolumenBackground(0);
 		}
 		
 		/**
@@ -318,6 +337,8 @@ package codeCraft.media
 			_buttonRecord.gotoAndStop("grabar");
 			//como termina la grabacion se reactiva el statusPlayer
 			MediaPlayer.statusSound(true);
+			//se restaura el audio de fondo
+			Audio.setVolumenBackground(1);
 		}
 		
 		/**

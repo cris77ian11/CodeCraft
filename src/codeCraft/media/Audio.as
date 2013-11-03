@@ -92,7 +92,11 @@ package codeCraft.media
 		public static function setVolumenPresentation (value:int = 0):void 
 		{
 			_volumenPresentation = value;
+			_soundTransformPresentation = _channelPresentation.soundTransform;
+			_soundTransformPresentation.volume = _volumenPresentation;
+			_channelPresentation.soundTransform = _soundTransformPresentation;
 		}
+		
 		
 		/**
 		 * 
@@ -120,6 +124,22 @@ package codeCraft.media
 				_volumenBackground = 1;
 				Button.over(event.currentTarget,1,2,true);
 				playAudio (_soundBackground,1);
+			}
+			_soundTransformBackground = _channelBackground.soundTransform;
+			_soundTransformBackground.volume = _volumenBackground;
+			_channelBackground.soundTransform = _soundTransformBackground;
+		}
+		
+		/**
+		 * Cambia el volumen del canal de audio del fondo
+		 * @param value Numero int entre 1 y 0 para la asignacion del volumen del canal del fondo
+		 */
+		public static function setVolumenBackground (value:int = 0):void 
+		{
+			_volumenBackground = value;
+			if(_channelBackgroundActive)
+			{
+			 	playAudio (_soundBackground,1);
 			}
 			_soundTransformBackground = _channelBackground.soundTransform;
 			_soundTransformBackground.volume = _volumenBackground;
@@ -211,7 +231,10 @@ package codeCraft.media
 			{
 				_channelBackground.removeEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
 			}
-			_channelBackgroundActive = false;
+			//el canad de fondo no se desabilita, se silencia para poder dar la opcion de restaurar nuevamente si este
+			//se encontraba sonando antes, esto se hace por medio de la funcion setVolumenBackgroun
+			setVolumenBackground();
+			//_channelBackgroundActive = false;
 			_channelPresentationActive = false;
 		}
 		

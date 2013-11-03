@@ -135,18 +135,21 @@ package codeCraft.media
 		 */
 		public static function statusSound(enabled:Boolean = false):void 
 		{
-			if(enabled)
+			if(_buttonPlay != null)
 			{
-				_statusSound = true;
-				_buttonPlay.gotoAndStop("play");
-			}
-			else
-			{
-				_statusSound = false;
-				_channelSound.stop();
-				_buttonPlay.gotoAndStop("pause");
-				//se oculta y se prohibe el llamado de la funciones 
-				TweenMax.to(_container,0.5,{alpha: 0,scaleX: 0, scaleY: 0, ease: Back.easeIn, onComplete: showContainerComplete});
+				if(enabled)
+				{
+					_statusSound = true;
+					_buttonPlay.gotoAndStop("play");
+				}
+				else
+				{
+					_statusSound = false;
+					_channelSound.stop();
+					_buttonPlay.gotoAndStop("pause");
+					//se oculta y se prohibe el llamado de la funciones 
+					TweenMax.to(_container,0.5,{alpha: 0,scaleX: 0, scaleY: 0, ease: Back.easeIn, onComplete: showContainerComplete});
+				}
 			}
 		}
 		

@@ -34,22 +34,43 @@ package codeCraft.utils
 		private static var _limiteMovimiento:Array;
 		/* Almacena el elemento actual que se esta moviendo */
 		private static var _elementoMovimientoActivo:*;
-		/* indica en que eje se va a posicionar los elementos en la funcion de carga */
-		private static var _ejeUbicacion:String;
-		/* indica la cantidad de columnas que va a formar el elemento de colision para ubicar las piezas */
-		private static var _cantidadColumnas:int;
+		/* distancia entre elementos y cantidad de columnas que se vana a ubicar */
+		private static var _opcionesAddChild:Array;
 		
-		public static function load (elementosMover:Array, elementosObjetivo:Array, posicionelementos:Array, ejeUbiacion:String = "x", cantidadColumnas:int = 1, elementosPosicion:Array = null, botonComparacion:MovieClip = null, areaRetorno:Array = null):void 
+		public static function load (elementosMover:Array, elementosObjetivo:Array, posicionelementos:Array, opcionesAddChild:Array = null, elementosPosicion:Array = null, botonComparacion:MovieClip = null, areaRetorno:Array = null):void 
 		{
 			_elementosObjetivo = elementosObjetivo;
 			_elementosMover = elementosMover;
 			_elementosPosicion = elementosPosicion;
 			_limiteMovimiento = areaRetorno;
 			_botonComparacion = botonComparacion;
-			_ejeUbicacion = ejeUbiacion;
 			_posiciones = posicionelementos;
-			_cantidadColumnas = cantidadColumnas;
+			_opcionesAddChild = opcionesAddChild;
 			_detectarColision = Arrays.fill(false,_elementosMover.length);
+			//se verifican las opciones de addchild
+			if(_opcionesAddChild == null)
+			{
+				_opcionesAddChild = new Array("x",10,1,20);
+			}
+			else
+			{
+				if(_opcionesAddChild[0] == undefined)
+				{
+					_opcionesAddChild[0] = "x";
+				}
+				if(_opcionesAddChild[1] == undefined)
+				{
+					_opcionesAddChild[1] = 10;
+				}
+				if(_opcionesAddChild[2] == undefined)
+				{
+					_opcionesAddChild[2] = 1;
+				}
+				if(_opcionesAddChild[3] == undefined)
+				{
+					_opcionesAddChild[3] = 20;
+				}
+			}
 			cargarElementos();
 			listenerMovimientoDrag();
 		}
@@ -81,21 +102,21 @@ package codeCraft.utils
 			//aleatorio elementos de movimiento
 			_elementosMover = Arrays.random(_elementosMover);
 			//carga elementos
-			CodeCraft.addChild(_elementosMover,null,_posiciones[0][0],_posiciones[0][1],_ejeUbicacion,10,_cantidadColumnas,20);
-			CodeCraft.addChild(_elementosObjetivo,null,_posiciones[1][0],_posiciones[1][1],_ejeUbicacion,10,_cantidadColumnas,20);
+			CodeCraft.addChild(_elementosMover,null,_posiciones[0][0],_posiciones[0][1],_opcionesAddChild[0],_opcionesAddChild[1],_opcionesAddChild[2],_opcionesAddChild[3]);
+			CodeCraft.addChild(_elementosObjetivo,null,_posiciones[1][0],_posiciones[1][1],_opcionesAddChild[0],_opcionesAddChild[1],_opcionesAddChild[2],_opcionesAddChild[3]);
 			if(_elementosPosicion != null)
 			{
-				CodeCraft.addChild(_elementosPosicion,null,_posiciones[2][0],_posiciones[2][1],_ejeUbicacion,10,_cantidadColumnas,20);
+				CodeCraft.addChild(_elementosPosicion,null,_posiciones[2][0],_posiciones[2][1],_opcionesAddChild[0],_opcionesAddChild[1],_opcionesAddChild[2],_opcionesAddChild[3]);
 				CodeCraft.property(_elementosPosicion,{alpha:0});
 			}
-			TweenMax.allFrom(_elementosMover,1,{alpha:0,scaleX:0,scaleY:1,ease:Back.easeOut});
-			TweenMax.allFrom(_elementosObjetivo,1,{alpha:0,scaleX:0,scaleY:1,ease:Back.easeOut});
+			TweenMax.allFrom(_elementosMover,1,{alpha:0,scaleX:0,scaleY:0,ease:Back.easeOut});
+			TweenMax.allFrom(_elementosObjetivo,1,{alpha:0,scaleX:0,scaleY:0,ease:Back.easeOut});
 		}
 		
 		private static function eliminarElementos():void 
 		{
-			TweenMax.allTo(_elementosMover,0.5,{alpha:0,scaleX:0,scaleY:1,ease:Back.easeIn, onComplete: CodeCraft.removeChild, onCompleteParams: [_elementosMover]});
-			TweenMax.allTo(_elementosObjetivo,0.5,{alpha:0,scaleX:0,scaleY:1,ease:Back.easeIn, onComplete: CodeCraft.removeChild, onCompleteParams: [_elementosObjetivo]});
+			TweenMax.allTo(_elementosMover,0.2,{alpha:0,scaleX:0,scaleY:0,ease:Back.easeIn, onComplete: CodeCraft.removeChild, onCompleteParams: [_elementosMover]});
+			TweenMax.allTo(_elementosObjetivo,0.2,{alpha:0,scaleX:0,scaleY:0,ease:Back.easeIn, onComplete: CodeCraft.removeChild, onCompleteParams: [_elementosObjetivo]});
 			CodeCraft.removeChild(_elementosPosicion);
 			_detectarColision = Arrays.fill(false,_elementosMover.length);
 			_elementosObjetivo = null;
