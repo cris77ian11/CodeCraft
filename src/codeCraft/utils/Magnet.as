@@ -82,7 +82,7 @@ package codeCraft.utils
 		{
 			for (var i:int = 0; i < _elementosIman.length; i++)
 			{
-				TweenMax.allTo(_elementosIman[i],1,{alpha: 0, scaleX: 0, scaleY: 0, ease:Back.easeOut, onComplete: CodeCraft.removeChild, onCompleteParams: [_elementosIman[i]]});
+				TweenMax.allTo(_elementosIman[i],0.5,{alpha: 0, scaleX: 0, scaleY: 0, ease:Back.easeIn, onComplete: CodeCraft.removeChild, onCompleteParams: [_elementosIman[i]]});
 				Drags.remove(_elementosIman[i]);
 			}
 			_elementosIman = null;
