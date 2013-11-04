@@ -8,6 +8,7 @@ package codeCraft.utils
 	import flash.events.MouseEvent;
 	
 	import codeCraft.core.CodeCraft;
+	import codeCraft.debug.Debug;
 	import codeCraft.events.Events;
 	import codeCraft.utils.Arrays;
 	
@@ -36,15 +37,18 @@ package codeCraft.utils
 		private static var _elementoMovimientoActivo:*;
 		/* distancia entre elementos y cantidad de columnas que se vana a ubicar */
 		private static var _opcionesAddChild:Array;
+		/* Indica si se verifica las colisiones por meido del texto que tienen en las cajas cada elemento, el texto es con el texto que se carga */
+		private static var _textosVerificacion:Array; 
 		
-		public static function load (elementosMover:Array, elementosObjetivo:Array, posicionelementos:Array, opcionesAddChild:Array = null, elementosPosicion:Array = null, botonComparacion:MovieClip = null, areaRetorno:Array = null):void 
+		public static function load (elementosMover:Array, elementosObjetivo:Array, posicionelementos:Array, opcionesAddChild:Array = null, elementosPosicion:Array = null, botonComparacion:MovieClip = null, areaRetorno:Array = null, textosVerificacion:Array = null):void 
 		{
-			_elementosObjetivo = elementosObjetivo;
-			_elementosMover = elementosMover;
-			_elementosPosicion = elementosPosicion;
+			_elementosObjetivo = Arrays.clone(elementosObjetivo);
+			_elementosMover = Arrays.clone(elementosMover);
+			_elementosPosicion = Arrays.clone(elementosPosicion);
 			_limiteMovimiento = areaRetorno;
 			_botonComparacion = botonComparacion;
-			_posiciones = posicionelementos;
+			_textosVerificacion = textosVerificacion;
+			_posiciones = Arrays.clone(posicionelementos);
 			_opcionesAddChild = opcionesAddChild;
 			_detectarColision = Arrays.fill(false,_elementosMover.length);
 			//se verifican las opciones de addchild
@@ -159,10 +163,15 @@ package codeCraft.utils
 			_posicionElementoObjetivo = -1;
 			_elementoMovimientoActivo = event.currentTarget; 
 			Events.listener(CodeCraft.getMainObject().stage,MouseEvent.MOUSE_UP, ubicarElementoMovimientoSoltado,false,false);
-			//verificamos en el array si tiene la posicion o colisiona con un elemento objetivo
-			for(var i:int = 0; i < _elementosObjetivo.length; i++)
+			var objetivoColision:Array = _elementosObjetivo;
+			if(_elementosPosicion != null)
 			{
-				if(_elementosObjetivo[i].x == event.currentTarget.x  && _elementosObjetivo[i].y == event.currentTarget.y)
+				objetivoColision = _elementosPosicion;
+			}
+			//verificamos en el array si tiene la posicion o colisiona con un elemento objetivo
+			for(var i:int = 0; i < objetivoColision.length; i++)
+			{
+				if(objetivoColision[i].x == event.currentTarget.x  && objetivoColision[i].y == event.currentTarget.y)
 				{
 					_posicionElementoObjetivo = i;
 				}
@@ -171,6 +180,11 @@ package codeCraft.utils
 		
 		private static function ubicarElementoMovimientoSoltado (event:MouseEvent):void 
 		{
+			var objetivoColision:Array = _elementosObjetivo;
+			if(_elementosPosicion != null)
+			{
+				objetivoColision = _elementosPosicion;
+			}
 			Events.removeListener(CodeCraft.getMainObject().stage,MouseEvent.MOUSE_UP, ubicarElementoMovimientoSoltado,false);
 			//captura la posicion del array del elemento para poder manipular posicion en los arrays
 			var posicionBoton:int = Arrays.indexOf(_elementosMover,_elementoMovimientoActivo);
@@ -201,6 +215,11 @@ package codeCraft.utils
 						{
 							_elementoMovimientoActivo.x = _elementosObjetivo[i].x;
 							_elementoMovimientoActivo.y = _elementosObjetivo[i].y;	
+						}
+						//se verifica si hay texto  y se carga en el elemento de objetivo
+						if(_textosVerificacion != null)
+						{
+							objetivoColision[i].texto.text = _textosVerificacion[i];
 						}
 						_detectarColision[i] = true;
 						//se verifica si el elemento objetivo es el mismo que el quetenia antes de moverse si no es el mismo
@@ -235,35 +254,61 @@ package codeCraft.utils
 			var labelsMovimiento:Array;
 			var numeroLabelObjetivo:int;
 			var numeroLabelMovimiento:int;
+			/* indicara si la pregunta es correcta por el medio de verificacion uque se haya usado */
+			var respuestaCorrecta:Boolean = false;
+			/* Almacena temprarlmente para verificar la colision */
+			var objetoColision:Array = _elementosObjetivo;
+			if(_elementosPosicion != null)
+			{
+				objetoColision = _elementosPosicion;
+			}
 			//recorre un array con los elementos objetivos y verifica por el nombre de instancia de los elementos, 
 			//leyendo el ultimo numero que indicara la posicion de los elementos en el array antes de desorndenarlos
 			//pero recorre el array de elementos en movimiento para detectar cual esta cargado al elemento objetivo.
-			for (var i:int = 0; i < _elementosObjetivo.length; i++)
+			for (var i:int = 0; i < objetoColision.length; i++)
 			{
-				nombreObjetivo = _elementosObjetivo[i].name.substr(_elementosObjetivo[i].name.length - 1);
-				labelsObjetivo = _elementosObjetivo[i].currentLabels;
+				nombreObjetivo = objetoColision[i].name.substr(objetoColision[i].name.length - 1);
+				labelsObjetivo = objetoColision[i].currentLabels;
 				//se busca el label mal y se carga si lo tiene
 				numeroLabelObjetivo = verificarLabels(labelsObjetivo,"mal");
 				if(numeroLabelObjetivo != -1)
 				{
-					_elementosObjetivo[i].gotoAndStop(labelsObjetivo[numeroLabelObjetivo].name);
+					objetoColision[i].gotoAndStop(labelsObjetivo[numeroLabelObjetivo].name);
 					
 				}
 				for (var j:int = 0; j < _elementosMover.length; j++)
 				{
+					respuestaCorrecta = false;
 					nombreMovimiento = _elementosMover[j].name.substr(_elementosMover[j].name.length - 1);
 					labelsMovimiento = _elementosMover[j].currentLabels;
 					//se busca el label mal y se carga si lo tiene
 					numeroLabelMovimiento = verificarLabels(labelsMovimiento,"mal");
-					if(numeroLabelMovimiento != -1)
+					if(numeroLabelMovimiento != -1 && _elementosMover[j].currentLabel != "bien")
 					{
 						_elementosMover[j].gotoAndStop(labelsMovimiento[numeroLabelMovimiento].name);
 					}
-					if(nombreMovimiento == nombreObjetivo 
-						&& _elementosObjetivo[i].x == _elementosMover[j].x 
-						&& _elementosObjetivo[i].y == _elementosMover[j].y)
+					//se comprueba si se activo la identificacion por medio de texto
+					if(_textosVerificacion != null)
 					{
-						////se buscan las labels de ambos elementos para indicar cual es la buena si no la tiene no se carga
+						if(objetoColision[j].texto.text == _textosVerificacion[i]
+							&& objetoColision[i].x == _elementosMover[j].x 
+							&& objetoColision[i].y == _elementosMover[j].y)
+						{
+							respuestaCorrecta = true;
+						}
+					}
+					else 
+					{
+						if(nombreMovimiento == nombreObjetivo 
+							&& objetoColision[i].x == _elementosMover[j].x 
+							&& objetoColision[i].y == _elementosMover[j].y)
+						{
+							respuestaCorrecta = true;
+						}
+					}
+					if(respuestaCorrecta)
+					{
+						//se buscan las labels de ambos elementos para indicar cual es la buena si no la tiene no se carga
 						numeroLabelMovimiento = verificarLabels(labelsMovimiento,"bien");
 						if(numeroLabelMovimiento != -1)
 						{
@@ -272,7 +317,7 @@ package codeCraft.utils
 						numeroLabelObjetivo = verificarLabels(labelsObjetivo,"bien");
 						if(numeroLabelObjetivo != -1)
 						{
-							_elementosObjetivo[i].gotoAndStop(labelsObjetivo[numeroLabelObjetivo].name);
+							objetoColision[j].gotoAndStop(labelsObjetivo[numeroLabelObjetivo].name);
 						}
 						break;
 					}

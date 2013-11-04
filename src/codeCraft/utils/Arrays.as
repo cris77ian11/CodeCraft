@@ -121,20 +121,26 @@ package codeCraft.utils {
 		//desordena un array
 		public static function random(array:Array):Array 
 		{
-			var arrayTemp:Array = new Array(); 
-			var arrayCopia:Array = clone(array);
-			while (arrayCopia.length > 0) 
+			if(array != null)
 			{
-				var _numero:Number = Math.floor(Math.random() * arrayCopia.length);
-				if(arrayCopia[_numero] is Array)
+				var arrayTemp:Array = new Array(); 
+				var arrayCopia:Array = clone(array);
+				while (arrayCopia.length > 0) 
 				{
-					arrayCopia[_numero] = random(arrayCopia[_numero]);
-					_numero = 0;
+					var _numero:Number = Math.floor(Math.random() * arrayCopia.length);
+					if(arrayCopia[_numero] is Array)
+					{
+						arrayCopia[_numero] = random(arrayCopia[_numero]);
+					}
+					arrayTemp.push(arrayCopia[_numero]); 
+					arrayCopia.splice(_numero, 1);	
 				}
-				arrayTemp.push(arrayCopia[_numero]); 
-				arrayCopia.splice(_numero, 1);	
+				return arrayTemp;
 			}
-			return arrayTemp;
+			else 
+			{
+				return null;
+			}
 		}
 		
 		/**
@@ -199,12 +205,19 @@ package codeCraft.utils {
 		 */
 		public static function clone(array:Array):Array
 		{
-			var arrayCopia:Array = new Array();
-			for(var i:uint = 0; i < array.length; i++)
+			if(array != null)
 			{
-				arrayCopia.push(array[i]);
+				var arrayCopia:Array = new Array();
+				for(var i:uint = 0; i < array.length; i++)
+				{
+					arrayCopia.push(array[i]);
+				}
+				return arrayCopia;
 			}
-			return arrayCopia;
+			else
+			{
+				return null;
+			}
 		}
 		
 	}

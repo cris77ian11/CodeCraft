@@ -15,7 +15,7 @@ package codeCraft.media
 	import codeCraft.core.CodeCraft;
 	import codeCraft.debug.Debug;
 	import codeCraft.events.Events;
-	import codeCraft.utils.Timers;
+	import codeCraft.utils.Timers; 
 	
 
 	public class MediaPlayer extends MovieClip
