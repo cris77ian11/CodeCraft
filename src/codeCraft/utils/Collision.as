@@ -39,6 +39,8 @@ package codeCraft.utils
 		private static var _opcionesAddChild:Array;
 		/* Indica si se verifica las colisiones por meido del texto que tienen en las cajas cada elemento, el texto es con el texto que se carga */
 		private static var _textosVerificacion:Array; 
+		/* Almacena los textos cargados para cada contenido para verificar si son respuestas correctas o no */
+		private static var _almacenarTextosVerificacion:Array;
 		
 		public static function load (elementosMover:Array, elementosObjetivo:Array, posicionelementos:Array, opcionesAddChild:Array = null, elementosPosicion:Array = null, botonComparacion:MovieClip = null, areaRetorno:Array = null, textosVerificacion:Array = null):void 
 		{
@@ -50,6 +52,7 @@ package codeCraft.utils
 			_textosVerificacion = textosVerificacion;
 			_posiciones = Arrays.clone(posicionelementos);
 			_opcionesAddChild = opcionesAddChild;
+			_almacenarTextosVerificacion = new Array();
 			_detectarColision = Arrays.fill(false,_elementosMover.length);
 			//se verifican las opciones de addchild
 			if(_opcionesAddChild == null)
@@ -219,7 +222,7 @@ package codeCraft.utils
 						//se verifica si hay texto  y se carga en el elemento de objetivo
 						if(_textosVerificacion != null)
 						{
-							objetivoColision[i].texto.text = _textosVerificacion[i];
+							_almacenarTextosVerificacion[i] = _textosVerificacion[i];
 						}
 						_detectarColision[i] = true;
 						//se verifica si el elemento objetivo es el mismo que el quetenia antes de moverse si no es el mismo
@@ -290,7 +293,7 @@ package codeCraft.utils
 					//se comprueba si se activo la identificacion por medio de texto
 					if(_textosVerificacion != null)
 					{
-						if(objetoColision[j].texto.text == _textosVerificacion[i]
+						if(_almacenarTextosVerificacion[i]== _textosVerificacion[j]
 							&& objetoColision[i].x == _elementosMover[j].x 
 							&& objetoColision[i].y == _elementosMover[j].y)
 						{

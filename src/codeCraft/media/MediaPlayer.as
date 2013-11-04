@@ -216,12 +216,15 @@ package codeCraft.media
 				Audio.stopAllSound(false);
 				_channelSound = _sound.play(_currentPosition);
 				_buttonPlay.gotoAndStop("pause");
+				Events.listener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
 			}
 			else 
 			{
 				_currentPosition = _channelSound.position;
 				_channelSound.stop();
 				_buttonPlay.gotoAndStop("play");
+				Audio.setVolumenBackground(1);
+				Events.removeListener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
 			}
 		}
 		
@@ -348,6 +351,7 @@ package codeCraft.media
 			{
 				Timers.timer(2,_functionReturn);
 			}
+			Audio.setVolumenBackground(1);
 		}
 		
 		/**
