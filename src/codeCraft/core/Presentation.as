@@ -184,6 +184,14 @@ package codeCraft.core {
 			}
 		}
 		
+		/**
+		 * Retorna la posicion actual en la que se encuentra la presentacion
+		 */
+		public static function getCurrentFrame():int 
+		{
+			return navigation['container'].currentFrame;
+		}
+		
 		private static function storePresentation():void 
 		{
 			var storeObject:Boolean = true;

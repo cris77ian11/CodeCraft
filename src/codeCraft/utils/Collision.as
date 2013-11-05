@@ -313,7 +313,7 @@ package codeCraft.utils
 				labelsObjetivo = objetoColision[i].currentLabels;
 				//se busca el label mal y se carga si lo tiene
 				numeroLabelObjetivo = verificarLabels(labelsObjetivo,"mal");
-				if(numeroLabelObjetivo != -1)
+				if(numeroLabelObjetivo != -1 && objetoColision[i].currentLabel != "bien")
 				{
 					objetoColision[i].gotoAndStop(labelsObjetivo[numeroLabelObjetivo].name);
 
@@ -359,7 +359,7 @@ package codeCraft.utils
 						numeroLabelObjetivo = verificarLabels(labelsObjetivo,"bien");
 						if(numeroLabelObjetivo != -1)
 						{
-							objetoColision[j].gotoAndStop(labelsObjetivo[numeroLabelObjetivo].name);
+							objetoColision[i].gotoAndStop(labelsObjetivo[numeroLabelObjetivo].name);
 						}
 						break;
 					}

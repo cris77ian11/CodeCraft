@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<actionScriptProperties analytics="false" mainApplicationPath="CodeCraft.as" projectUUID="94d614bf-2793-46db-8ca6-fa56d5482870" version="11">
+<actionScriptProperties analytics="false" mainApplicationPath="CodeCraft.as" projectUUID="a6972ad0-5e99-4f3e-9260-bffe993ed173" version="11">
   <compiler additionalCompilerArguments="-locale en_US" autoRSLOrdering="true" copyDependentFiles="false" fteInMXComponents="false" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" useFlashSDK="false" verifyDigests="true" warn="true">
     <compilerSourcePath>
-      <compilerSourcePathEntry kind="1" linkType="1" path="C:/AS3/src"/>
       <compilerSourcePathEntry kind="1" linkType="1" path="C:/AS3/greensock-as3"/>
+      <compilerSourcePathEntry kind="1" linkType="1" path="C:/AS3/src"/>
     </compilerSourcePath>
     <libraryPath defaultLinkType="0">
       <libraryPathEntry kind="4" path="">
@@ -12,8 +12,8 @@
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/core.swc" useDefaultLinkType="false"/>
         </excludedEntries>
       </libraryPathEntry>
-      <libraryPathEntry kind="1" linkType="1" path="src/media"/>
       <libraryPathEntry kind="3" linkType="1" path="${FLASHPRO_APPCONFIG}/ActionScript 3.0/libs/flash.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="1" linkType="1" path="src/media"/>
       <libraryPathEntry kind="1" linkType="1" path="C:/AS3/src"/>
     </libraryPath>
     <sourceAttachmentPath/>
