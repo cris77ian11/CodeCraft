@@ -1,11 +1,11 @@
 package codeCraft.utils {
 	import codeCraft.debug.Debug;
 	import codeCraft.error.Validation;
-	
-	public class Arrays	
+
+	public class Arrays
 	{
-		
-		
+
+
 		public static function stop(array:Array):void
 		{
 			try
@@ -20,10 +20,10 @@ package codeCraft.utils {
 				Debug.print("No se puede detener los movieclips en el fotograma especificado.","Arrays.stop","Falla CodeCraft ");
 			}
 		}
-		
+
 		public static function play(array:Array):void
 		{
-			try 
+			try
 			{
 				for(var i:int = 0; i < array.length; i++)
 				{
@@ -44,7 +44,7 @@ package codeCraft.utils {
 				Debug.print("No se puede aplicar play a los movieclips.","Arrays.play","Falla CodeCraft ");
 			}
 		}
-		
+
 		public static function indexOf(array:*, valor:* = null, type:String = "normal"):* {
 			var _posicionArray:Array = new Array();
 			if (array is Array) {
@@ -97,7 +97,7 @@ package codeCraft.utils {
 				}
 			}
 		}
-		
+
 		//elimina un elemento del array y lo devuelve
 		public static function remove (array:Array, object:*):* {
 			var _posicion:Number = indexOf(array,object,'todo');
@@ -108,7 +108,7 @@ package codeCraft.utils {
 			}
 			return object;
 		}
-		
+
 		//reordena un array poniendo ubicando los elementos de adelante a atras
 		public static function reverse (array:Array):Array{
 			var arrayTemp:Array = new Array();
@@ -117,35 +117,39 @@ package codeCraft.utils {
 			}
 			return arrayTemp;
 		}
-		
+
 		//desordena un array
-		public static function random(array:Array):Array 
+		public static function random(array:Array):Array
 		{
 			if(array != null)
 			{
-				var arrayTemp:Array = new Array(); 
+				var arrayTemp:Array = new Array();
 				var arrayCopia:Array = clone(array);
-				while (arrayCopia.length > 0) 
+				while (arrayCopia.length > 0)
 				{
-					var _numero:Number = Math.floor(Math.random() * arrayCopia.length);
+					var _numero:Number = 0;
 					if(arrayCopia[_numero] is Array)
 					{
 						arrayCopia[_numero] = random(arrayCopia[_numero]);
 					}
-					arrayTemp.push(arrayCopia[_numero]); 
-					arrayCopia.splice(_numero, 1);	
+					else
+					{
+						_numero = Math.floor(Math.random() * arrayCopia.length);
+					}
+					arrayTemp.push(arrayCopia[_numero]);
+					arrayCopia.splice(_numero, 1);
 				}
 				return arrayTemp;
 			}
-			else 
+			else
 			{
 				return null;
 			}
 		}
-		
+
 		/**
 		 * LLena un array con los valores indicados, se puede asignar un espacio total del arreglo, tambien se  peude indicar
-		 * desde que espacio del array quiere iniciar la carga de elementos y hasta que espacio, por defecto se llenara 
+		 * desde que espacio del array quiere iniciar la carga de elementos y hasta que espacio, por defecto se llenara
 		 * todo si no se modifican los valores
 		 * @param value Valor de cualquier tipo con el que se quiera llenar el array
 		 * @param sizeArray Tamano maximo de elemento que tiene o va a tener el array
@@ -153,7 +157,7 @@ package codeCraft.utils {
 		 * @param positionFinal Valor numerico que indica hasta donde se va a llenar el arreglo
 		 * @param valueNull Valor que se almacena en los campos del array que no se llenaran con el valor value
 		 */
-		public static function fill (value:*, sizeArray:int = 1, positionInitial:int = 0, positionFinal:int = 0, valueNull:* = null):Array 
+		public static function fill (value:*, sizeArray:int = 1, positionInitial:int = 0, positionFinal:int = 0, valueNull:* = null):Array
 		{
 			if (positionFinal == 0 || positionFinal < positionInitial)
 			{
@@ -170,13 +174,13 @@ package codeCraft.utils {
 				{
 					arrayTemp.push(valueNull);
 				}
-				
+
 			}
 			return arrayTemp;
 		}
-		
+
 		/**
-		 * Se encarga de recorrer el array y verificar si el elemento que se pasa como value se encuentra en 
+		 * Se encarga de recorrer el array y verificar si el elemento que se pasa como value se encuentra en
 		 * el array por completo, es decir si se quiere saber si un array esta lleno todos sus campos de true
 		 * se utiliza la funcion, de estar lleno devolvera true, de tener aunque sea un campo con otro valor
 		 * devolvera false.
@@ -194,14 +198,14 @@ package codeCraft.utils {
 			}
 			return true;
 		}
-		
-		
+
+
 		/**
 		 * Clona un array y devuelve la copia exacta del mismo, con la diferencia de que este se puede modificar
-		 * y las acciones aplicadas a este no alteran al array de origen. 
+		 * y las acciones aplicadas a este no alteran al array de origen.
 		 * @param array
-		 * @return 
-		 * 
+		 * @return
+		 *
 		 */
 		public static function clone(array:Array):Array
 		{
@@ -219,6 +223,6 @@ package codeCraft.utils {
 				return null;
 			}
 		}
-		
+
 	}
 }

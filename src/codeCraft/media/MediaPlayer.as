@@ -2,7 +2,7 @@ package codeCraft.media
 {
 	import com.greensock.TweenMax;
 	import com.greensock.easing.Back;
-	
+
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -11,16 +11,16 @@ package codeCraft.media
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	import flash.net.URLRequest;
-	
+
 	import codeCraft.core.CodeCraft;
 	import codeCraft.debug.Debug;
 	import codeCraft.events.Events;
-	import codeCraft.utils.Timers; 
-	
+	import codeCraft.utils.Timers;
+
 
 	public class MediaPlayer extends MovieClip
 	{
-		
+
 		private static var _buttonSound:MovieClip;
 		/* Contenine los botones del menu para realizar la reproduccion, se pone null para cuando se elimine se compare si ya fue cargado o no */
 		private static var _container:MovieClip = null;
@@ -39,12 +39,12 @@ package codeCraft.media
 		private static var _currentPosition:Number = 0;
 		private static var _soundTransform:SoundTransform = new SoundTransform();
 		private static var _volumen:Number = 1;
-		
-		
+
+
 		/**
-		 * 
+		 *
 		 */
-		public static function load (buttonSound:MovieClip,containerMediaPlayer:MovieClip, buttonPlay:MovieClip, buttonPrev:MovieClip, buttonNext:MovieClip, progressBar:MovieClip, controlBar:MovieClip, position:Array = null, functionReturn:Function = null):void 
+		public static function load (buttonSound:MovieClip,containerMediaPlayer:MovieClip, buttonPlay:MovieClip, buttonPrev:MovieClip, buttonNext:MovieClip, progressBar:MovieClip, controlBar:MovieClip, position:Array = null, functionReturn:Function = null):void
 		{
 			_buttonSound = buttonSound;
 			_container = containerMediaPlayer;
@@ -61,7 +61,7 @@ package codeCraft.media
 				{
 					CodeCraft.addChild(_buttonSound,null,position[0]);
 				}
-				
+
 			}
 			if(!(CodeCraft.getMainObject().contains(_container)))
 			{
@@ -84,11 +84,11 @@ package codeCraft.media
 				TweenMax.from(_container,0.7,{alpha: 0,scaleX: 0, scaleY: 0, ease: Back.easeOut, onComplete: showContainerComplete});
 			}
 		}
-		
+
 		/**
 		 * Elimina el rreproductor de musica
 		 */
-		public static function remove():void 
+		public static function remove():void
 		{
 			_channelSound.stop();
 			//se comprueba que el elemento ya haya sido creado
@@ -107,33 +107,33 @@ package codeCraft.media
 				}
 			}
 		}
-		
-		
+
+
 		/**
 		 * Carga la url que tiene el audio para ser reproducido
 		 * @param ruta String con url donde se almacena el audio
 		 */
-		public static function loadSound (ruta:* = null):void 
+		public static function loadSound (ruta:* = null):void
 		{
 			var url:URLRequest = new URLRequest(ruta);
 			_sound = new Sound(url);
 			_sound.addEventListener(IOErrorEvent.IO_ERROR, errorLoadSound);
 		}
-		
+
 		/**
 		 * Se ejecuta si la url no se puede cargar
 		 */
-		private static function errorLoadSound(event:IOErrorEvent):void 
+		private static function errorLoadSound(event:IOErrorEvent):void
 		{
 			Debug.print("Verifique la url del audio, al parecer no existe tal ruta.","MediaPlayer.loadSound","Falla CodeCraft ");
 		}
-		
-		
+
+
 		/**
-		 * 
+		 *
 		 * @param enabled Boolean que indica si se debe activar los controles true, o si se desactivan false
 		 */
-		public static function statusSound(enabled:Boolean = false):void 
+		public static function statusSound(enabled:Boolean = false):void
 		{
 			if(_buttonPlay != null)
 			{
@@ -147,19 +147,19 @@ package codeCraft.media
 					_statusSound = false;
 					_channelSound.stop();
 					_buttonPlay.gotoAndStop("pause");
-					//se oculta y se prohibe el llamado de la funciones 
+					//se oculta y se prohibe el llamado de la funciones
 					TweenMax.to(_container,0.5,{alpha: 0,scaleX: 0, scaleY: 0, ease: Back.easeIn, onComplete: showContainerComplete});
 				}
 			}
 		}
-		
+
 		/**
 		 * Funcion que se activa cuando se presiona el boton del sonido, inicia la animacion para mostrar el cotenedor
 		 * tambien desabilita el listener del boton que activo la funcion, cuando termine la animacion reactiva el listener
 		 * para poder realizar la animacion
 		 * @param event Object del MouseEvent
 		 */
-		private static function clicSound(event:MouseEvent):void 
+		private static function clicSound(event:MouseEvent):void
 		{
 			//se verifica si hay un audio para mostrar el menu
 			if(_sound != null)
@@ -178,11 +178,11 @@ package codeCraft.media
 				}
 			}
 		}
-		
+
 		/**
 		 * Se carga cuando termina la animacion de mostrar o ocultar el menu del reproductor
 		 */
-		private static function showContainerComplete ():void 
+		private static function showContainerComplete ():void
 		{
 			Events.listener(_buttonSound,MouseEvent.CLICK, clicSound,true,true);
 			//si el boton es visible, tambien si esl estado de los controles es activo
@@ -209,25 +209,18 @@ package codeCraft.media
 			}
 		}
 
-		private static function clicPlay (event:Event):void 
+		private static function clicPlay (event:Event):void
 		{
 			if(_buttonPlay.currentLabel == "play")
 			{
-				Audio.stopAllSound(false);
-				_channelSound = _sound.play(_currentPosition);
-				_buttonPlay.gotoAndStop("pause");
-				Events.listener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
+				reproducirAudio();
 			}
-			else 
+			else
 			{
-				_currentPosition = _channelSound.position;
-				_channelSound.stop();
-				_buttonPlay.gotoAndStop("play");
-				Audio.setVolumenBackground(1);
-				Events.removeListener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
+				detenerAudio();
 			}
 		}
-		
+
 		private static function prevDown (event:MouseEvent):void
 		{
 			//si el mouse es presionado
@@ -242,10 +235,8 @@ package codeCraft.media
 				Events.removeListener(_buttonPrev,Event.ENTER_FRAME, changeAudioPrev);
 			}
 			changeVolumen();
-			//al presionar si el audio estaba detenido se iniciara nuevamente
-			_buttonPlay.gotoAndStop("pause");
 		}
-		
+
 		private static function nextDown (event:MouseEvent):void
 		{
 			//si el mouse es presionado
@@ -254,32 +245,30 @@ package codeCraft.media
 				_volumen = 0;
 				Events.listener(_buttonNext,Event.ENTER_FRAME, changeAudioNext);
 			}
-			else 
+			else
 			{
 				_volumen = 1;
 				Events.removeListener(_buttonNext,Event.ENTER_FRAME, changeAudioNext);
 			}
 			changeVolumen();
-			//al presionar si el audio estaba detenido se iniciara nuevamente
-			_buttonPlay.gotoAndStop("pause");
 		}
-		
-		private static function changeAudioPrev (event:Event):void 
+
+		private static function changeAudioPrev (event:Event):void
 		{
 			var position:Number = (_channelSound.position - 250);
 			_channelSound.stop();
 			_channelSound = _sound.play(position);
 			changeVolumen();
 		}
-		
-		private static function changeAudioNext (event:Event):void 
+
+		private static function changeAudioNext (event:Event):void
 		{
 			var position:Number = (_channelSound.position + 150);
 			_channelSound.stop();
 			_channelSound = _sound.play(position);
 			changeVolumen();
 		}
-		
+
 		private static function barDown (event:MouseEvent):void
 		{
 			//si el mouse es presionado
@@ -290,7 +279,7 @@ package codeCraft.media
 				Events.listener(_controlBar,Event.ENTER_FRAME, soundScrub);
 				Events.listener(CodeCraft.getMainObject().stage,MouseEvent.MOUSE_UP, barDown,true);
 			}
-			else 
+			else
 			{
 				_volumen = 1;
 				Events.listener(_container,Event.ENTER_FRAME, soundProgress);
@@ -298,16 +287,14 @@ package codeCraft.media
 				Events.removeListener(CodeCraft.getMainObject().stage,MouseEvent.MOUSE_UP, barDown,true);
 			}
 			changeVolumen();
-			//al presionar la barra se inicia nuevamente el audio
-			_buttonPlay.gotoAndStop("pause");
 		}
-		
+
 		/**
 		 * Se ejecuta muentras se este moviendo el mouse sobre la barra para controlar el progreso
 		 * del audio
 		 * @param event Object de Event
 		 */
-		private static function soundScrub(event:Event):void 
+		private static function soundScrub(event:Event):void
 		{
 			var soundDist:Number = (CodeCraft.getMainObject().mouseX - _container.x - _controlBar.x) / _controlBar.width;
 			if(soundDist < 0)
@@ -323,48 +310,54 @@ package codeCraft.media
 			_progressBar.scaleX = soundDist;
 			changeVolumen();
 		}
-		
+
 		/**
 		 * Se ejecuta mientras essta sonando el audio y su objetivo es hacer que la barra se mueva
 		 * para dar el efecto de que el audio esta cargando
 		 * @param event Object del MouseEvent
 		 */
-		private static function soundProgress(event:Event):void 
-		{    
+		private static function soundProgress(event:Event):void
+		{
 			var loadTime:Number = _sound.bytesLoaded / _sound.bytesTotal;
 			var loadPercent:uint = Math.round(100 * loadTime);
 			var estimatedLength:int = Math.ceil(_sound.length / (loadTime));
 			var playbackPercent:uint = Math.round(100 * (_channelSound.position / estimatedLength));
-			_progressBar.scaleX = playbackPercent/100;
-			_duration = estimatedLength;
+			if(_progressBar.scaleX < 1 && _progressBar.scaleX >= 0)
+			{
+				_progressBar.scaleX = playbackPercent/100;
+				_duration = estimatedLength;
+			}
+			else
+			{
+				detenerAudio();
+			}
 		}
-		
+
 		/**
 		 * Se ejecuta para volver el boton de volumen a su forma original despues de terminar el audio
 		 */
-		private static function soundComplete (event:Event):void 
+		private static function soundComplete (event:Event):void
 		{
 			Events.removeListener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
-			_buttonPlay.gotoAndStop("play");
-			//se verifica  si tiene una funcion que devolver
-			if(_functionReturn != null)
-			{
-				Timers.timer(2,_functionReturn);
-			}
-			Audio.setVolumenBackground(1);
+			detenerAudio();
 		}
-		
+
 		/**
-		 * 
+		 *
 		 */
-		private static function changeVolumen ():void 
+		private static function changeVolumen ():void
 		{
 			Events.removeListener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
 			_soundTransform.volume = _volumen;
 			_channelSound.soundTransform = _soundTransform;
 			Events.listener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
+			//al presionar si el audio estaba detenido se iniciara nuevamente
+			if(_volumen == 1)
+			{
+				_buttonPlay.gotoAndStop("pause");
+			}
 		}
-		
+
 		/**
 		 * Elimina los listener y limpia las variables para eliminar todo por completo
 		 */
@@ -386,6 +379,28 @@ package codeCraft.media
 			_container = null;
 			_sound = null;
 		}
-		
+
+		private static function detenerAudio():void
+		{
+			//se verifica  si tiene una funcion que devolver
+			if(_functionReturn != null)
+			{
+				Timers.timer(2,_functionReturn);
+			}
+			_currentPosition = _channelSound.position;
+			_channelSound.stop();
+			_buttonPlay.gotoAndStop("play");
+			Audio.setVolumenBackground(1);
+			Events.removeListener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
+		}
+
+		private static function reproducirAudio ():void
+		{
+			Audio.stopAllSound(false);
+			_channelSound = _sound.play(_currentPosition);
+			_buttonPlay.gotoAndStop("pause");
+			Events.listener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
+		}
+
 	}
 }
