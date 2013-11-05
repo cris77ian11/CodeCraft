@@ -3,10 +3,10 @@ package codeCraft.utils
 
 	import com.greensock.TweenMax;
 	import com.greensock.easing.Back;
-
+	
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
-
+	
 	import codeCraft.core.CodeCraft;
 	import codeCraft.debug.Debug;
 	import codeCraft.events.Events;
@@ -50,8 +50,8 @@ package codeCraft.utils
 			_limiteMovimiento = areaRetorno;
 			_botonComparacion = botonComparacion;
 			_textosVerificacion = textosVerificacion;
-			_posiciones = Arrays.clone(posicionelementos);
 			_opcionesAddChild = opcionesAddChild;
+			_posiciones = Arrays.clone(posicionelementos);
 			_almacenarTextosVerificacion = new Array();
 			_detectarColision = Arrays.fill(false,_elementosMover.length);
 			//se verifican las opciones de addchild
@@ -110,29 +110,33 @@ package codeCraft.utils
 			_elementosMover = Arrays.random(_elementosMover);
 			//carga elementos, y se verifica si los elementos de posicion son para cargar un elemento por columnas, o tiene una ubicacion
 			//especifica la ubicacion esacta de cada elemento
-			if(_posiciones[0][1] is Array)
+			var posicionMoverX:* = _posiciones[0];
+			var posicionMoverY:Number = 0;
+			var posicionObjetivoX:* = _posiciones[1];
+			var posicionObjetivoY:Number = 0;
+			
+			if(!(_posiciones[0][0] is Array))
 			{
-				_posiciones[0][1] = 0;
+				posicionMoverX = _posiciones[0][0];
+				posicionMoverY = _posiciones[0][1];
 			}
-			if(_posiciones[1][1] is Array)
+			if(!(_posiciones[1][0] is Array))
 			{
-				_posiciones[1][1] = 0;
-			}
-			var arrayTemp:*;
-			if(_posiciones[1][0] is Array)
-			{
-				arrayTemp = _posiciones[1];
-				Debug.print(_posiciones[1]);
-			}
-			else
-			{
-				arrayTemp = _posiciones[1][0];
-			}
-			CodeCraft.addChild(_elementosMover,null,_posiciones[0][0],_posiciones[0][1],_opcionesAddChild[0],_opcionesAddChild[1],_opcionesAddChild[2],_opcionesAddChild[3]);
-			CodeCraft.addChild(_elementosObjetivo,null,arrayTemp,_posiciones[1][1],_opcionesAddChild[0],_opcionesAddChild[1],_opcionesAddChild[2],_opcionesAddChild[3]);
+				posicionObjetivoX = _posiciones[1][0];
+				posicionObjetivoY = _posiciones[1][1];
+			}			
+			CodeCraft.addChild(_elementosMover,null,posicionMoverX,posicionMoverY,_opcionesAddChild[0],_opcionesAddChild[1],_opcionesAddChild[2],_opcionesAddChild[3]);
+			CodeCraft.addChild(_elementosObjetivo,null,posicionObjetivoX,posicionObjetivoY,_opcionesAddChild[0],_opcionesAddChild[1],_opcionesAddChild[2],_opcionesAddChild[3]);
 			if(_elementosPosicion != null)
 			{
-				CodeCraft.addChild(_elementosPosicion,null,_posiciones[2][0],_posiciones[2][1],_opcionesAddChild[0],_opcionesAddChild[1],_opcionesAddChild[2],_opcionesAddChild[3]);
+				var posicionPosicionX:* = _posiciones[2];
+				var posicionPosicionY:Number = 0;
+				if(!(_posiciones[2][0] is Array))
+				{
+					posicionPosicionX = _posiciones[2][0];
+					posicionPosicionY = _posiciones[2][1];
+				}	
+				CodeCraft.addChild(_elementosPosicion,null,posicionPosicionX,posicionPosicionY,_opcionesAddChild[0],_opcionesAddChild[1],_opcionesAddChild[2],_opcionesAddChild[3]);
 				CodeCraft.property(_elementosPosicion,{alpha:0});
 			}
 			TweenMax.allFrom(_elementosMover,1,{alpha:0,scaleX:0,scaleY:0,ease:Back.easeOut});

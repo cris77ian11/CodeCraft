@@ -26,6 +26,7 @@ package codeCraft.debug{
 		}
 		
 		public static function initialize ():void{
+			MonsterDebugger.initialize(CodeCraft.getMainObject());
 			stats = new Stats();
 			CodeCraft.addChild(stats);
 			statsAdded = true;
@@ -59,17 +60,17 @@ package codeCraft.debug{
 					{
 						if(object[i] is Array)
 						{
-							print(object[i]," __ Array " + i,type);
+							print(object[i],"  __ Array " + i,type);
 						}
 						else
 						{
 							if(object[i] is String || object[i] is Number || object[i] is Boolean)
 							{
-								trace(i + ': ' + object[i]);
+								trace("Elemento " + i + ': ' + object[i]);
 							}
 							else 
 							{
-								trace(i + ': ' + object[i] + ' - name: ' + object[i].name);
+								trace("Elemento " + i + ': ' + object[i] + ' - name: ' + object[i].name);
 							}
 						}
 					}
@@ -85,6 +86,9 @@ package codeCraft.debug{
 						trace(type + name + ": " + object + ' - name: ' + object.name);
 					}
 				}
+				
+				//se imprime en el monster debugger
+				MonsterDebugger.trace(CodeCraft.getMainObject(),object,name,type);
 			}
 			catch(error:Error)
 			{
