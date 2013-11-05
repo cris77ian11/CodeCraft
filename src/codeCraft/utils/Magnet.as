@@ -105,6 +105,8 @@ package codeCraft.utils
 		{
 			Events.removeListener(_elementosIman,MouseEvent.MOUSE_DOWN, detectarMovimientoElementoIman,false);
 			Events.removeListener(_botonComparacionIman,MouseEvent.CLICK, comprobarIman,true);
+			Events.removeListener(CodeCraft.getMainObject().stage,MouseEvent.MOUSE_UP, eliminarMovimientoElementoIman,false);
+			Events.removeListener(CodeCraft.getMainObject().stage,MouseEvent.MOUSE_MOVE, moverIman,false);
 		}
 
 		private static function capturarPosicionElementosIman ():void
@@ -191,7 +193,6 @@ package codeCraft.utils
 					else
 					{
 						CodeCraft.stopFrame(_elementosIman[i][j],"mal");
-						
 					}
 				}
 			}

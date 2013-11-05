@@ -174,7 +174,6 @@ package codeCraft.utils {
 				{
 					arrayTemp.push(valueNull);
 				}
-
 			}
 			return arrayTemp;
 		}

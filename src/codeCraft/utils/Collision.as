@@ -44,14 +44,14 @@ package codeCraft.utils
 
 		public static function load (elementosMover:Array, elementosObjetivo:Array, posicionelementos:Array, opcionesAddChild:Array = null, elementosPosicion:Array = null, botonComparacion:MovieClip = null, areaRetorno:Array = null, textosVerificacion:Array = null):void
 		{
-			_elementosObjetivo = Arrays.clone(elementosObjetivo);
-			_elementosMover = Arrays.clone(elementosMover);
-			_elementosPosicion = Arrays.clone(elementosPosicion);
+			_elementosObjetivo = elementosObjetivo;
+			_elementosMover = elementosMover;
+			_elementosPosicion = elementosPosicion;
 			_limiteMovimiento = areaRetorno;
 			_botonComparacion = botonComparacion;
 			_textosVerificacion = textosVerificacion;
 			_opcionesAddChild = opcionesAddChild;
-			_posiciones = Arrays.clone(posicionelementos);
+			_posiciones = posicionelementos;
 			_almacenarTextosVerificacion = new Array();
 			_detectarColision = Arrays.fill(false,_elementosMover.length);
 			//se verifican las opciones de addchild
