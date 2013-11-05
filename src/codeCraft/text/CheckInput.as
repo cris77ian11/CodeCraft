@@ -4,7 +4,6 @@ package codeCraft.text
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
-	import codeCraft.core.CodeCraft;
 	import codeCraft.events.Events;
 	import codeCraft.utils.Arrays;
 
@@ -26,8 +25,6 @@ package codeCraft.text
 		private static var _botonComprobar:MovieClip;
 		/* cantidad de caracteres a limitar por caja de texto */
 		private static var _limiteCaracteres:int;
-		/* Se usa para indicar que palabras deben agregar pero no se toman en cuenta en la verificacion, son como la trampa */
-		private static var _trampas:String;
 
 		/**
 		 *
@@ -35,16 +32,14 @@ package codeCraft.text
 		 * @param textosCorrectos
 		 * @param limiteCaracteres
 		 * @param botonComprobar
-		 * @param trampas
 		 */
-		public static function load(casjasInputsTexto:Array, textosCorrectos:Array, limiteCaracteres:int = 5, botonComprobar:MovieClip = null, trampas:String = ""):void
+		public static function load(casjasInputsTexto:Array, textosCorrectos:Array, limiteCaracteres:int = 5, botonComprobar:MovieClip = null):void
 		{
 			_cajasInputTexto = casjasInputsTexto;
 			_textosCorrectos = textosCorrectos;
 			_limiteCaracteres = limiteCaracteres;
 			_botonComprobar = botonComprobar;
-			_trampas = trampas;
-
+			configurar();
 		}
 
 		/**
@@ -52,16 +47,14 @@ package codeCraft.text
 		 */
 		public static function remove():void
 		{
-			Events.listener(_cajasInputTexto, FocusEvent.FOCUS_OUT, activar);
-			Events.listener(_cajasInputTexto, FocusEvent.FOCUS_IN, capturaFoco);
+			eliminarListener();
 			_cajasInputTexto = null;
 			_textosCorrectos = null;
 			_limiteCaracteres = 5;
 			_botonComprobar = null;
-			_trampas = "";
 		}
 
-		private static function ConfigurarCajas(CatidadCaracteres:int, restricPalabras:Array, BtnComprobar:*, escepcion:String):void
+		private static function configurar():void
 		{
 			Events.listener(_botonComprobar, MouseEvent.CLICK, comprobarInputs)
 			//Configuramos las restricciones de las cajas.
@@ -70,15 +63,24 @@ package codeCraft.text
 				//indica la cantidad de caracteres maximos que puede tener
 				_cajasInputTexto[i].maxChars = _limiteCaracteres;
 				//indica las palabras qeu solo se permiten ingresar
-				_cajasInputTexto[i].restrict = _textosCorrectos + _trampas;
+				_cajasInputTexto[i].restrict = "A-z 0-9";
 				//indica el orden del tabulador 
 				_cajasInputTexto[i].tabIndex = i;
 			}
+		}
+		
+		private static function listener():void
+		{
 			Events.listener(_cajasInputTexto, FocusEvent.FOCUS_OUT, activar);
 			Events.listener(_cajasInputTexto, FocusEvent.FOCUS_IN, capturaFoco);
-
 		}
 
+		private static function eliminarListener():void
+		{
+			Events.removeListener(_cajasInputTexto, FocusEvent.FOCUS_OUT, activar);
+			Events.removeListener(_cajasInputTexto, FocusEvent.FOCUS_IN, capturaFoco);
+		}
+		
 		/**
 		 * Verifica que ninguna de las cajas esten vacias y si se encuentra en la antepenultima
 		 * caja para cambiar el foco del elemento al boton de comprobar.
@@ -95,7 +97,6 @@ package codeCraft.text
 					{
 						_cajasInputTexto[0].tabIndex = 2;
 						_botonComprobar.tabIndex = 1;
-						CodeCraft.focoActive(_botonComprobar);
 					}
 				}
 
@@ -108,7 +109,6 @@ package codeCraft.text
 					_cajasInputTexto[j].selectable = false;
 					_cajasInputTexto[j].tabIndex = null;
 				}
-				CodeCraft.focoActive(_botonComprobar);
 			}
 		}
 
@@ -138,7 +138,6 @@ package codeCraft.text
 
 		private static function comprobarInputs(event:MouseEvent):void
 		{
-			CodeCraft.focoActive(event.currentTarget);
 			for (var i:int = 0; i < _textosCorrectos.length; i++)
 			{
 				//si la caja de texto esta vacia me la marca  de color rojo y no valida
@@ -166,11 +165,8 @@ package codeCraft.text
 						_cajasInputTexto[i].selectable = true;
 
 					}
-
 				}
-
 			}
-
 		}
 		
 	}
