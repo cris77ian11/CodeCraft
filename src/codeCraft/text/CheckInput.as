@@ -5,6 +5,7 @@ package codeCraft.text
 	import flash.events.MouseEvent;
 	
 	import codeCraft.core.CodeCraft;
+	import codeCraft.debug.Debug;
 	import codeCraft.events.Events;
 	import codeCraft.utils.Arrays;
 
@@ -38,6 +39,7 @@ package codeCraft.text
 		{
 			_cajasInputTexto = casjasInputsTexto;
 			_textosCorrectos = textosCorrectos;
+			Debug.print(_textosCorrectos);
 			_limiteCaracteres = limiteCaracteres;
 			_botonComprobar = botonComprobar;
 			configurar();
@@ -67,6 +69,8 @@ package codeCraft.text
 				_cajasInputTexto[i].restrict = "A-z";
 				//indica el orden del tabulador 
 				_cajasInputTexto[i].tabIndex = i;
+				_cajasInputTexto[i].addEventListener(FocusEvent.FOCUS_OUT, activar);
+				_cajasInputTexto[i].addEventListener(FocusEvent.FOCUS_IN, capturaFoco);
 			}
 			CodeCraft.focoActive(_cajasInputTexto[0]);
 		}
@@ -96,17 +100,19 @@ package codeCraft.text
 		 */
 		private static function activar(event:FocusEvent):void
 		{
+			//se iguala a cero par que no siga sumando
+			_buenos = 0;
 			for (var i:int = 0; i < _cajasInputTexto.length; i++)
 			{
 				if (_cajasInputTexto[i].text != "")
 				{
+					_buenos += 1;
 					//si el contador buenos es igual a la cantidad de elementos -1 cambiamos el index 
 					//para que al precionar la tecla tab se dirija a el boton de Comparar no a la primera caja		
 					if (_buenos == _cajasInputTexto.length - 1)
 					{
 						_cajasInputTexto[0].tabIndex = 2;
 						_botonComprobar.tabIndex = 1;
-						CodeCraft.property(_botonComprobar,{alpha:1});
 					}
 				}
 
@@ -114,6 +120,7 @@ package codeCraft.text
 			//Valida que todas las cajas de texto sean correctas
 			if (_buenos == _cajasInputTexto.length)
 			{
+				CodeCraft.property(_botonComprobar,{alpha:1});
 				for (var j:int = 0; j < _textosCorrectos.length; j++)
 				{
 					_cajasInputTexto[j].selectable = false;
@@ -158,12 +165,13 @@ package codeCraft.text
 				}
 				else
 				{
+					trace(String(_textosCorrectos[0]).toUpperCase());
+					trace(String(_cajasInputTexto[i].text).toUpperCase());
 					//valida todas las cajas de texto con el array que contiene las  respuestas correctas, _textosCorrectos
 					if (String(_textosCorrectos[i]).toUpperCase() == String(_cajasInputTexto[i].text).toUpperCase())
 					{
 						//si la opcion es correcta
 						_cajasInputTexto[i].textColor = 0x028901;
-						_buenos += 1;
 						_cajasInputTexto[i].mouseEnabled = false;
 					}
 					else
