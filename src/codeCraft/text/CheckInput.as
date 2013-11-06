@@ -194,7 +194,7 @@ package codeCraft.text
 		{
 			if (Keyboard.TAB)
 			{
-				e.preventDefault();
+				event.preventDefault();
 			}
 		}
 	
