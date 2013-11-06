@@ -171,7 +171,6 @@ package codeCraft.text
 						_cajasInputTexto[i].textColor = 0x028901;
 						_cajasInputTexto[i].mouseEnabled = false;
 						_cajasInputTexto[i].selectable = false;
-						Events.listener(_cajasInputTexto[i],FocusEvent.KEY_FOCUS_CHANGE,DeshabilitaTab,false,false);
 					}
 					else
 					{
@@ -183,6 +182,7 @@ package codeCraft.text
 						_cajasInputTexto[i].tabIndex = i;
 					}
 				}
+				Events.listener(_cajasInputTexto[i],FocusEvent.KEY_FOCUS_CHANGE,DeshabilitaTab,false,false);
 			}
 		}
 		
@@ -194,7 +194,7 @@ package codeCraft.text
 		{
 			if (Keyboard.TAB)
 			{
-				trace("tab");
+				trace("Tab esta desabilitado");
 				e.preventDefault();
 			}
 		}
