@@ -66,6 +66,7 @@
 		 */
 		public static function initialize (object:Object, functionPreloadComplete:* = null):void
 		{
+			trace("gato");
 			CodeCraft.mainObject = object;
 			//crea el recuadro que hace de mascara para recortar elescenario
 			maskStage.graphics.beginFill(0x000000, 1);
