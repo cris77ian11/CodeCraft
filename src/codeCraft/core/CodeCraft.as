@@ -65,7 +65,7 @@
 		 * @param functionPreloadComplete Indica la funcion que se devolvera cuando finalice el proceso de precarga, por defecto es null indicando que no hay precarga
 		 */
 		public static function initialize (object:Object, functionPreloadComplete:* = null):void
-		{
+		{ 
 			CodeCraft.mainObject = object;
 			//crea el recuadro que hace de mascara para recortar elescenario
 			maskStage.graphics.beginFill(0x000000, 1);

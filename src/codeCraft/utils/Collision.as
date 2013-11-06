@@ -41,8 +41,24 @@ package codeCraft.utils
 		private static var _textosVerificacion:Array;
 		/* Almacena los textos cargados para cada contenido para verificar si son respuestas correctas o no */
 		private static var _almacenarTextosVerificacion:Array;
+		/* Almacena las funciones a retornar para cuando termine de realziar el proceso de comparacion, termina bien o mal */
+		private static var _funcionesRetornar:Array;
+		/* Almacena un array con valores Booleanos que corresponden a la cantidad de elementos objetivos de la colision, true indica que colisiono con el correcto y false con el malo */
+		private static var _resultadoColision:Array;
 
-		public static function load (elementosMover:Array, elementosObjetivo:Array, posicionelementos:Array, opcionesAddChild:Array = null, elementosPosicion:Array = null, botonComparacion:MovieClip = null, areaRetorno:Array = null, textosVerificacion:Array = null):void
+		/**
+		 * 
+		 * @param elementosMover
+		 * @param elementosObjetivo
+		 * @param posicionelementos
+		 * @param opcionesAddChild
+		 * @param elementosPosicion
+		 * @param botonComparacion
+		 * @param areaRetorno
+		 * @param textosVerificacion
+		 * @param funcionesRetornar Es un array que contiene como primer parametro la funcion a retornar cuando se presiona el boton de comparar, luego una funcion que se utiliza para cuando gana, y por ultimo cuando pierde
+		 */
+		public static function load (elementosMover:Array, elementosObjetivo:Array, posicionelementos:Array, opcionesAddChild:Array = null, elementosPosicion:Array = null, botonComparacion:MovieClip = null, areaRetorno:Array = null, textosVerificacion:Array = null, funcionesRetornar:Array = null):void
 		{
 			_elementosObjetivo = elementosObjetivo;
 			_elementosMover = elementosMover;
@@ -53,6 +69,7 @@ package codeCraft.utils
 			_opcionesAddChild = opcionesAddChild;
 			_posiciones = posicionelementos;
 			_almacenarTextosVerificacion = new Array();
+			_funcionesRetornar = funcionesRetornar;
 			_detectarColision = Arrays.fill(false,_elementosMover.length);
 			//se verifican las opciones de addchild
 			if(_opcionesAddChild == null)
@@ -141,6 +158,13 @@ package codeCraft.utils
 			}
 			TweenMax.allFrom(_elementosMover,1,{alpha:0,scaleX:0,scaleY:0,ease:Back.easeOut});
 			TweenMax.allFrom(_elementosObjetivo,1,{alpha:0,scaleX:0,scaleY:0,ease:Back.easeOut});
+			//se llena el array de los resultados de colision con el elemento objetivo
+			var objetivo:Array = _elementosObjetivo;
+			if(_elementosPosicion != null)
+			{
+				objetivo = _elementosPosicion;
+			}
+			_resultadoColision = Arrays.fill(false,objetivo.length);
 		}
 
 		private static function eliminarElementos():void
@@ -361,7 +385,37 @@ package codeCraft.utils
 						{
 							objetoColision[i].gotoAndStop(labelsObjetivo[numeroLabelObjetivo].name);
 						}
+						_resultadoColision[i] = true;
 						break;
+					}
+				}
+			}
+			//se verifica si hay funciones qeu devolver
+			if(_funcionesRetornar != null)
+			{
+				var funcionTemporal:Function;
+				if(_funcionesRetornar[0] != undefined && _funcionesRetornar[0] != null)
+				{
+					funcionTemporal = _funcionesRetornar[0];
+					funcionTemporal();
+				}
+				//se verifica si gano o perdio la actividad
+				if(Arrays.verifyFill(_resultadoColision,true))
+				{
+					//gano, por lo que se verifica si hay funcion de gano para devolver
+					if(_funcionesRetornar[1] != undefined && _funcionesRetornar[1] != null)
+					{
+						funcionTemporal = _funcionesRetornar[1];
+						funcionTemporal();
+					}
+				}
+				else
+				{
+					//perdio y se verifica si hay funcion que devolver
+					if(_funcionesRetornar[2] != undefined && _funcionesRetornar[2] != null)
+					{
+						funcionTemporal = _funcionesRetornar[2];
+						funcionTemporal();
 					}
 				}
 			}
