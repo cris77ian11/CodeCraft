@@ -71,6 +71,7 @@ package codeCraft.text
 				_cajasInputTexto[i].tabIndex = i;
 				_cajasInputTexto[i].addEventListener(FocusEvent.FOCUS_OUT, activar);
 				_cajasInputTexto[i].addEventListener(FocusEvent.FOCUS_IN, capturaFoco);
+				_cajasInputTexto[i].addEventListener(MouseEvent.CLICK, cambiarFoco);
 			}
 			CodeCraft.focoActive(_cajasInputTexto[0]);
 		}
