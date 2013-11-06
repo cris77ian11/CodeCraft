@@ -71,6 +71,8 @@ package codeCraft.text
 				_cajasInputTexto[i].addEventListener(FocusEvent.FOCUS_OUT, activar);
 				_cajasInputTexto[i].addEventListener(FocusEvent.FOCUS_IN, capturaFoco);
 			}
+			//esta linea no esta por eso era el problema.
+			listener();
 			CodeCraft.focoActive(_cajasInputTexto[0]);
 		}
 		
@@ -122,7 +124,6 @@ package codeCraft.text
 				CodeCraft.property(_botonComprobar, {alpha: 1});
 				for (var j:int = 0; j < _textosCorrectos.length; j++)
 				{
-					_cajasInputTexto[j].selectable = false;
 					_cajasInputTexto[j].tabIndex = null;
 				}
 			}
@@ -171,6 +172,7 @@ package codeCraft.text
 						_cajasInputTexto[i].textColor = 0x028901;
 						_cajasInputTexto[i].mouseEnabled = false;
 						_cajasInputTexto[i].selectable = false;
+						Events.listener(_cajasInputTexto[i],FocusEvent.KEY_FOCUS_CHANGE,DeshabilitaTab,false,false);
 					}
 					else
 					{
@@ -178,11 +180,10 @@ package codeCraft.text
 						//Restaura el contador a 0 para que no entre a la comprobacion final
 						_buenos = 0;
 						_cajasInputTexto[i].textColor = 0xC40000;
-						_cajasInputTexto[i].selectable = true;
 						_cajasInputTexto[i].tabIndex = i;
 					}
 				}
-				Events.listener(CodeCraft.getMainObject().stage,FocusEvent.KEY_FOCUS_CHANGE,DeshabilitaTab,false,false);
+				
 			}
 		}
 		
