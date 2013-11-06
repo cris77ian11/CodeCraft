@@ -172,6 +172,7 @@ package codeCraft.text
 						_cajasInputTexto[i].textColor = 0x028901;
 						_cajasInputTexto[i].mouseEnabled = false;
 						_cajasInputTexto[i].selectable = false;
+						//Desabilita el TAB de las cajas correctas.
 						Events.listener(_cajasInputTexto[i],FocusEvent.KEY_FOCUS_CHANGE,DeshabilitaTab,false,false);
 					}
 					else
