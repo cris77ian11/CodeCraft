@@ -1,11 +1,11 @@
 package codeCraft.utils {
 	
-	import codeCraft.debug.Debug;
-	import codeCraft.text.Texts;
-	
 	import flash.display.MovieClip;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
+	
+	import codeCraft.debug.Debug;
+	import codeCraft.text.Texts;
 	
 	public class Timers extends MovieClip{
 		
@@ -21,12 +21,12 @@ package codeCraft.utils {
 		
 		//funciones para el manejo de los timer y retornar una funcion cuando este finalice
 
-		public static function timer (time:Number, onComplete:Function, repeat:int = 1):void{
+		public static function timer (time:Number, onComplete:Function, repeatTimer:int = 1):void{
 			try{
-				var timerNew:Timer = new Timer(time*1000,repeat);
-				timerNew.addEventListener(TimerEvent.TIMER,timerComplete);
+				var timerNew:Timer = new Timer(time*1000,repeatTimer);
+				timerNew.addEventListener(TimerEvent.TIMER_COMPLETE,timerComplete);
 				timerNew.start();
-				var arrayTemp:Array = new Array(timerNew,onComplete,repeat);
+				var arrayTemp:Array = new Array(timerNew,onComplete,repeatTimer);
 				arrayTimer.push(arrayTemp);
 			}catch(error:Error){
 				Debug.print('El timer no tiene los parametros correctos, falta insertar una funcion de retorno o ocurrio un error interno','SISTEMA','ERROR');
@@ -45,17 +45,19 @@ package codeCraft.utils {
 		}
 		
 		private static function timerComplete (event:TimerEvent):void {
-			var position:int = Arrays.indexOf(arrayTimer,event.currentTarget,'todo');
-			if(position != -1){
-				arrayTimer[position][1]();
-				if(arrayTimer[position][2] == 1){
-					arrayTimer[position][2]--;
+			var posicion:int = Arrays.indexOf(arrayTimer,event.currentTarget,'todo');
+			if(posicion != -1){
+				arrayTimer[posicion][1]();
+				if(arrayTimer[posicion][2] != 0){
+					arrayTimer[posicion][2]--;
 					event.currentTarget.stop();
-					event.currentTarget.removeEventListener(TimerEvent.TIMER,timerComplete);
+					event.currentTarget.removeEventListener(TimerEvent.TIMER_COMPLETE,timerComplete);
+					arrayTimer.splice(posicion,1);
 				}
 			}else {
 				Debug.print('Error en la funcion timerComplete de CodeCraft, no se encontro el elemento timer en arrayTimer','SISTEMA','ERROR');
 			}
+			Debug.print(arrayTimer.length);
 		}
 		
 		//funciones para el cronometro

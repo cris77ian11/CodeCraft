@@ -166,8 +166,6 @@ package codeCraft.text
 				}
 				else
 				{
-					trace(String(_textosCorrectos[0]).toUpperCase());
-					trace(String(_cajasInputTexto[i].text).toUpperCase());
 					//valida todas las cajas de texto con el array que contiene las  respuestas correctas, _textosCorrectos
 					if (String(_textosCorrectos[i]).toUpperCase() == String(_cajasInputTexto[i].text).toUpperCase())
 					{
