@@ -194,7 +194,6 @@ package codeCraft.text
 		{
 			if (Keyboard.TAB)
 			{
-				trace("Tab esta desabilitado");
 				e.preventDefault();
 			}
 		}
