@@ -182,7 +182,7 @@ package codeCraft.text
 						_cajasInputTexto[i].tabIndex = i;
 					}
 				}
-				Events.listener(_cajasInputTexto[i],FocusEvent.KEY_FOCUS_CHANGE,DeshabilitaTab,false,false);
+				Events.listener(CodeCraft.getMainObject().stage,FocusEvent.KEY_FOCUS_CHANGE,DeshabilitaTab,false,false);
 			}
 		}
 		
