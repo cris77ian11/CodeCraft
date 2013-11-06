@@ -394,7 +394,7 @@ package codeCraft.utils
 			if(_funcionesRetornar != null)
 			{
 				var funcionTemporal:Function;
-				if(_funcionesRetornar[0] != undefined)
+				if(_funcionesRetornar[0] != undefined && _funcionesRetornar[0] != null)
 				{
 					funcionTemporal = _funcionesRetornar[0];
 					funcionTemporal();
@@ -403,7 +403,7 @@ package codeCraft.utils
 				if(Arrays.verifyFill(_resultadoColision,true))
 				{
 					//gano, por lo que se verifica si hay funcion de gano para devolver
-					if(_funcionesRetornar[1] != undefined)
+					if(_funcionesRetornar[1] != undefined && _funcionesRetornar[1] != null)
 					{
 						funcionTemporal = _funcionesRetornar[1];
 						funcionTemporal();
@@ -412,7 +412,7 @@ package codeCraft.utils
 				else
 				{
 					//perdio y se verifica si hay funcion que devolver
-					if(_funcionesRetornar[2] != undefined)
+					if(_funcionesRetornar[2] != undefined && _funcionesRetornar[2] != null)
 					{
 						funcionTemporal = _funcionesRetornar[2];
 						funcionTemporal();
