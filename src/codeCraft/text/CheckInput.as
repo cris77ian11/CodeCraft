@@ -1,22 +1,21 @@
 package codeCraft.text
 {
-	import flash.display.MovieClip;
-	import flash.events.FocusEvent;
-	import flash.events.MouseEvent;
-	
 	import codeCraft.core.CodeCraft;
 	import codeCraft.debug.Debug;
 	import codeCraft.events.Events;
 	import codeCraft.utils.Arrays;
-
-
+	import flash.display.MovieClip;
+	import flash.events.FocusEvent;
+	import flash.events.MouseEvent;
+	import flash.ui.Keyboard;
+	
 	/**
 	 *
 	 * @author luisfelipe
 	 */
 	public class CheckInput
 	{
-
+		
 		/* Indica al final si todas las cajas estan buenas */
 		private static var _buenos:int = 0;
 		/* Almacena las palabras que son correctas para cada input */
@@ -27,7 +26,7 @@ package codeCraft.text
 		private static var _botonComprobar:MovieClip;
 		/* cantidad de caracteres a limitar por caja de texto */
 		private static var _limiteCaracteres:int;
-
+		
 		/**
 		 *
 		 * @param casjasInputsTexto
@@ -44,7 +43,7 @@ package codeCraft.text
 			_botonComprobar = botonComprobar;
 			configurar();
 		}
-
+		
 		/**
 		 *
 		 */
@@ -56,7 +55,7 @@ package codeCraft.text
 			_limiteCaracteres = 5;
 			_botonComprobar = null;
 		}
-
+		
 		private static function configurar():void
 		{
 			Events.listener(_botonComprobar, MouseEvent.CLICK, comprobarInputs)
@@ -71,7 +70,6 @@ package codeCraft.text
 				_cajasInputTexto[i].tabIndex = i;
 				_cajasInputTexto[i].addEventListener(FocusEvent.FOCUS_OUT, activar);
 				_cajasInputTexto[i].addEventListener(FocusEvent.FOCUS_IN, capturaFoco);
-				_cajasInputTexto[i].addEventListener(MouseEvent.CLICK, cambiarFoco);
 			}
 			CodeCraft.focoActive(_cajasInputTexto[0]);
 		}
@@ -80,21 +78,21 @@ package codeCraft.text
 		{
 			Events.listener(_cajasInputTexto, FocusEvent.FOCUS_OUT, activar);
 			Events.listener(_cajasInputTexto, FocusEvent.FOCUS_IN, capturaFoco);
-			Events.listener(_cajasInputTexto,MouseEvent.CLICK, cambiarFoco,false,false);
+			Events.listener(_cajasInputTexto, MouseEvent.CLICK, cambiarFoco, false, false);
 		}
-
+		
 		private static function eliminarListener():void
 		{
 			Events.removeListener(_cajasInputTexto, FocusEvent.FOCUS_OUT, activar);
 			Events.removeListener(_cajasInputTexto, FocusEvent.FOCUS_IN, capturaFoco);
-			Events.removeListener(_cajasInputTexto,MouseEvent.CLICK, cambiarFoco,false);
+			Events.removeListener(_cajasInputTexto, MouseEvent.CLICK, cambiarFoco, false);
 		}
 		
-		
-		private static function cambiarFoco (event:MouseEvent):void 
+		private static function cambiarFoco(event:MouseEvent):void
 		{
 			CodeCraft.focoActive(event.currentTarget);
 		}
+		
 		/**
 		 * Verifica que ninguna de las cajas esten vacias y si se encuentra en la antepenultima
 		 * caja para cambiar el foco del elemento al boton de comprobar.
@@ -116,12 +114,12 @@ package codeCraft.text
 						_botonComprobar.tabIndex = 1;
 					}
 				}
-
+				
 			}
 			//Valida que todas las cajas de texto sean correctas
 			if (_buenos == _cajasInputTexto.length)
 			{
-				CodeCraft.property(_botonComprobar,{alpha:1});
+				CodeCraft.property(_botonComprobar, {alpha: 1});
 				for (var j:int = 0; j < _textosCorrectos.length; j++)
 				{
 					_cajasInputTexto[j].selectable = false;
@@ -129,31 +127,29 @@ package codeCraft.text
 				}
 			}
 		}
-
-
+		
 		/**
 		 * restaurar los bordes de las cajas y sus textos a su color original
 		 * @param event
 		 */
 		private static function capturaFoco(event:FocusEvent):void
 		{
-
+			
 			if (event.target)
 			{
 				var posicion:int = Arrays.indexOf(_cajasInputTexto, event.currentTarget);
 				//Desactivamos el borde de la caja
 				_cajasInputTexto[posicion].border = false;
-
+				
 				if (_cajasInputTexto[posicion].text.length <= 0)
 				{
 					//si la caja esta vacia restaura al color negro
 					_cajasInputTexto[posicion].textColor = 0x000000;
 				}
 			}
-
+		
 		}
-
-
+		
 		private static function comprobarInputs(event:MouseEvent):void
 		{
 			for (var i:int = 0; i < _textosCorrectos.length; i++)
@@ -166,12 +162,15 @@ package codeCraft.text
 				}
 				else
 				{
+					trace(String(_textosCorrectos[0]).toUpperCase());
+					trace(String(_cajasInputTexto[i].text).toUpperCase());
 					//valida todas las cajas de texto con el array que contiene las  respuestas correctas, _textosCorrectos
 					if (String(_textosCorrectos[i]).toUpperCase() == String(_cajasInputTexto[i].text).toUpperCase())
 					{
 						//si la opcion es correcta
 						_cajasInputTexto[i].textColor = 0x028901;
 						_cajasInputTexto[i].mouseEnabled = false;
+						_cajasInputTexto[i].selectable = false;
 					}
 					else
 					{
@@ -180,11 +179,24 @@ package codeCraft.text
 						_buenos = 0;
 						_cajasInputTexto[i].textColor = 0xC40000;
 						_cajasInputTexto[i].selectable = true;
-
+						_cajasInputTexto[i].tabIndex = i;
 					}
 				}
+				Events.listener(_cajasInputTexto[i],FocusEvent.KEY_FOCUS_CHANGE,DeshabilitaTab,false,false);
 			}
 		}
 		
+		/**
+		 * Evita que al final de la comprobacion y al precionar tab realice el cambio de caja.. asi el  usuario va diretamente a la caja mala en cuestion.
+		 * @param	event
+		 */
+		private static function DeshabilitaTab(event:FocusEvent):void
+		{
+			if (Keyboard.TAB)
+			{
+				e.preventDefault();
+			}
+		}
+	
 	}
 }
