@@ -55,9 +55,8 @@ package codeCraft.utils {
 					arrayTimer.splice(posicion,1);
 				}
 			}else {
-				Debug.print('Error en la funcion timerComplete de CodeCraft, no se encontro el elemento timer en arrayTimer','SISTEMA','ERROR');
+				Debug.print('No se encontro el elemento timer en arrayTimer','Timers.timerComplete','Falla CodeCraft ');
 			}
-			Debug.print(arrayTimer.length);
 		}
 		
 		//funciones para el cronometro
