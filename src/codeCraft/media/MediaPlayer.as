@@ -115,9 +115,16 @@ package codeCraft.media
 		 */
 		public static function loadSound (ruta:* = null):void
 		{
-			var url:URLRequest = new URLRequest(ruta);
-			_sound = new Sound(url);
-			_sound.addEventListener(IOErrorEvent.IO_ERROR, errorLoadSound);
+			if(ruta != null)
+			{
+				var url:URLRequest = new URLRequest(ruta);
+				_sound = new Sound(url);
+				_sound.addEventListener(IOErrorEvent.IO_ERROR, errorLoadSound);
+			}
+			else
+			{
+				Debug.print("La ruta es un valor null.","MediaPlayer.loadSound","Mensaje no se asuste ");
+			}
 		}
 
 		/**

@@ -284,7 +284,7 @@ package codeCraft.media
 						_channelBackground = _audio.play(position,numberLoop);
 						_channelBackground.soundTransform = _soundTransformBackground;
 						_channelBackgroundActive = true;
-						_channelBackground.addEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+						//_channelBackground.addEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
 					}
 					else 
 					{
@@ -293,7 +293,7 @@ package codeCraft.media
 						_channelPresentation = _audio.play(position,numberLoop);
 						_channelPresentation.soundTransform = _soundTransformPresentation;
 						_channelPresentationActive = true;
-						_channelPresentation.addEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
+						//_channelPresentation.addEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
 					}
 				}
 				else 
@@ -418,7 +418,7 @@ package codeCraft.media
 			if(_functionReturnComplete != null)
 			{
 				_functionReturnComplete();
-				_functionReturnComplete = null;
+				//_functionReturnComplete = null;
 			}
 		}
 		
