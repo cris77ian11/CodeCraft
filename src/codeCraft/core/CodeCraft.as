@@ -576,7 +576,8 @@
 				mainObject.stage.stageFocusRect = false;
 				mainObject.stage.focus = foco;
 				//agerga listener para seguir cargando el foco
-				mainObject.stage.addEventListener(MouseEvent.CLICK,focoNavigation);
+				Events.removeListener(mainObject.stage,MouseEvent.CLICK,focoNavigation,false);
+				Events.listener(mainObject.stage,MouseEvent.CLICK,focoNavigation,false,false);
 			}
 			else
 			{

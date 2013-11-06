@@ -4,6 +4,7 @@ package codeCraft.text
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
+	import codeCraft.core.CodeCraft;
 	import codeCraft.events.Events;
 	import codeCraft.utils.Arrays;
 
@@ -63,24 +64,32 @@ package codeCraft.text
 				//indica la cantidad de caracteres maximos que puede tener
 				_cajasInputTexto[i].maxChars = _limiteCaracteres;
 				//indica las palabras qeu solo se permiten ingresar
-				_cajasInputTexto[i].restrict = "A-z 0-9";
+				_cajasInputTexto[i].restrict = "A-z";
 				//indica el orden del tabulador 
 				_cajasInputTexto[i].tabIndex = i;
 			}
+			CodeCraft.focoActive(_cajasInputTexto[0]);
 		}
 		
 		private static function listener():void
 		{
 			Events.listener(_cajasInputTexto, FocusEvent.FOCUS_OUT, activar);
 			Events.listener(_cajasInputTexto, FocusEvent.FOCUS_IN, capturaFoco);
+			Events.listener(_cajasInputTexto,MouseEvent.CLICK, cambiarFoco,false,false);
 		}
 
 		private static function eliminarListener():void
 		{
 			Events.removeListener(_cajasInputTexto, FocusEvent.FOCUS_OUT, activar);
 			Events.removeListener(_cajasInputTexto, FocusEvent.FOCUS_IN, capturaFoco);
+			Events.removeListener(_cajasInputTexto,MouseEvent.CLICK, cambiarFoco,false);
 		}
 		
+		
+		private static function cambiarFoco (event:MouseEvent):void 
+		{
+			CodeCraft.focoActive(event.currentTarget);
+		}
 		/**
 		 * Verifica que ninguna de las cajas esten vacias y si se encuentra en la antepenultima
 		 * caja para cambiar el foco del elemento al boton de comprobar.
@@ -97,6 +106,7 @@ package codeCraft.text
 					{
 						_cajasInputTexto[0].tabIndex = 2;
 						_botonComprobar.tabIndex = 1;
+						CodeCraft.property(_botonComprobar,{alpha:1});
 					}
 				}
 
@@ -149,7 +159,7 @@ package codeCraft.text
 				else
 				{
 					//valida todas las cajas de texto con el array que contiene las  respuestas correctas, _textosCorrectos
-					if (_textosCorrectos[i].toUpperCase() == _cajasInputTexto[i].text.toUpperCase())
+					if (String(_textosCorrectos[i]).toUpperCase() == String(_cajasInputTexto[i].text).toUpperCase())
 					{
 						//si la opcion es correcta
 						_cajasInputTexto[i].textColor = 0x028901;
