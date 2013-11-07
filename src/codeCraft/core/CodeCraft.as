@@ -13,7 +13,7 @@
 	import flash.text.TextField;
 	import flash.ui.ContextMenu;
 	import flash.ui.ContextMenuItem;
-
+	
 	import codeCraft.debug.Debug;
 	import codeCraft.display.Menu;
 	import codeCraft.error.Validation;
@@ -140,24 +140,32 @@
 			}
 		}
 
-		public static function getChildren (parent:*, frame:int = 0):Array
+		public static function getChildren (parent:*, frame:int = 0, nivel:int = 1):Array
 		{
-			var arrayChildren:Array = new Array();
-			if(parent is Object || parent is MovieClip)
+			var arrayChildren:Array;
+			if(parent is MovieClip && parent != null)
 			{
-				if(frame != 0)
+				if(frame != 0) 
 				{
-					parent.gotoAndStop(frame)
-				}
-				for(var i:uint = 0; i < parent.numChildren; i++)
+					parent.gotoAndStop(frame);
+				} 
+				for(var i:int = 0; i < parent.numChildren; i++)
 				{
-					var object:* = parent.getChildAt(i);
-					arrayChildren.push(object);
+					if(parent.getChildAt(i) is MovieClip  && parent.getChildAt(i) != null)
+					{
+						var object:* = parent.getChildAt(i);
+						arrayChildren.push(object);
+						if(nivel == 0)
+						{
+							var arrayTemporal:Array = getChildren(object,frame,nivel);
+							arrayChildren.push(arrayTemporal);					
+						}
+					}
 				}
 			}
 			else
 			{
-				Validation.error('El elemento parent de getChildren no es un Object o movieClip por lo que no se puede obtener los children');
+				//Validation.error('El elemento parent de getChildren no es un Object o movieClip por lo que no se puede obtener los children');
 			}
 			return arrayChildren;
 		}

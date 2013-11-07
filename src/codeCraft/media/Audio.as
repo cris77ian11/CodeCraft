@@ -9,8 +9,10 @@ package codeCraft.media
 	import flash.media.SoundTransform;
 	import flash.net.URLRequest;
 	
+	import codeCraft.core.CodeCraft;
 	import codeCraft.debug.Debug;
 	import codeCraft.display.Button;
+	import codeCraft.display.Menu;
 	
 	public class Audio 
 	{
@@ -38,6 +40,8 @@ package codeCraft.media
 		private static var _channelPresentationActive:Boolean = false;
 		private static var _channelBackgroundActive:Boolean = false;
 		
+		/* Almacenara el movieclip que es cargado como boton de audio de fondo en el menu */
+		
 		/**
 		 * Detiene el sonido de la presentación, la funcion esta como publica para permitir que
 		 * se asigne a objeto, por defecto la función ya esta asignada a el boton de sonido
@@ -63,14 +67,14 @@ package codeCraft.media
 			{
 				//Silencia
 				_positionSoundPresentation = _channelPresentation.position;
-				event.currentTarget.gotoAndStop('silencio');
+				CodeCraft.stopFrame(event.currentTarget,"silencio");
 				Button.removeOver(event.currentTarget,1);
 				_volumenPresentation = 0;
 			} 
 			else
 			{
 				//reproduce de  nuevo
-				event.currentTarget.gotoAndStop('normal');
+				CodeCraft.stopFrame(event.currentTarget,"normal");
 				_volumenPresentation = 1;
 				Button.over(event.currentTarget,1,null,true);
 				//se verifica si se pauso el audio para que no se reproduzca
@@ -113,14 +117,16 @@ package codeCraft.media
 			if (_volumenBackground == 1) 
 			{
 				//Silencia
-				event.currentTarget.gotoAndStop('silencio');
+				CodeCraft.stopFrame(event.currentTarget,"silencio");
+				CodeCraft.stopFrame(Menu.botonSonidoFondo,"silencio");
 				Button.removeOver(event.currentTarget,1);
 				_volumenBackground = 0;
 			} 
 			else 
 			{
 				//reproduce de  nuevo
-				event.currentTarget.gotoAndStop('normal');
+				CodeCraft.stopFrame(event.currentTarget,"normal");
+				CodeCraft.stopFrame(Menu.botonSonidoFondo,"normal");
 				_volumenBackground = 1;
 				Button.over(event.currentTarget,1,2,true);
 				playAudio (_soundBackground,1);
@@ -139,7 +145,15 @@ package codeCraft.media
 			_volumenBackground = value;
 			if(_channelBackgroundActive)
 			{
-			 	playAudio (_soundBackground,1);
+				//se verifica si esta activo  el boton de sonido para activar el audio
+				if(Menu.botonSonidoFondo.currentLabel == "normal")
+				{
+			 		playAudio (_soundBackground,1);
+				}
+				else
+				{
+					_volumenBackground = 0;
+				}
 			}
 			_soundTransformBackground = _channelBackground.soundTransform;
 			_soundTransformBackground.volume = _volumenBackground;
