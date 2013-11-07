@@ -26,6 +26,8 @@ package codeCraft.text
 		private static var _botonComprobar:MovieClip;
 		/* cantidad de caracteres a limitar por caja de texto */
 		private static var _limiteCaracteres:int;
+		/* Almacena las funciones a retornar para cuando termine de realziar el proceso de comparacion, termina bien o mal */
+		private static var _funcionesRetornar:Array;
 		
 		/**
 		 *
@@ -34,13 +36,14 @@ package codeCraft.text
 		 * @param limiteCaracteres
 		 * @param botonComprobar
 		 */
-		public static function load(casjasInputsTexto:Array, textosCorrectos:Array, limiteCaracteres:int = 5, botonComprobar:MovieClip = null):void
+		public static function load(casjasInputsTexto:Array, textosCorrectos:Array, limiteCaracteres:int = 5, botonComprobar:MovieClip = null,funcionesRetornar:Array = null):void
 		{
 			_cajasInputTexto = casjasInputsTexto;
 			_textosCorrectos = textosCorrectos;
 			Debug.print(_textosCorrectos);
 			_limiteCaracteres = limiteCaracteres;
 			_botonComprobar = botonComprobar;
+			_funcionesRetornar = funcionesRetornar;
 			configurar();
 		}
 		
@@ -185,6 +188,37 @@ package codeCraft.text
 					}
 				}
 				
+			}
+			
+			//se verifica si hay funciones qeu devolver
+			if(_funcionesRetornar != null)
+			{
+				var funcionTemporal:Function;
+				if(_funcionesRetornar[0] != undefined && _funcionesRetornar[0] != null)
+				{
+					funcionTemporal = _funcionesRetornar[0];
+					funcionTemporal();
+				}
+				//se verifica si gano o perdio la actividad
+				trace(contadorCorrectas);
+				if(contadorCorrectas==8)
+				{
+					//gano, por lo que se verifica si hay funcion de gano para devolver
+					if(_funcionesRetornar[1] != undefined && _funcionesRetornar[1] != null)
+					{
+						funcionTemporal = _funcionesRetornar[1];
+						funcionTemporal();
+					}
+				}
+				if(incontadorCorrectas>0)
+				{
+					//perdio y se verifica si hay funcion que devolver
+					if(_funcionesRetornar[2] != undefined && _funcionesRetornar[2] != null)
+					{
+						funcionTemporal = _funcionesRetornar[2];
+						funcionTemporal();
+					}
+				}
 			}
 		}
 		
