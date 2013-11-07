@@ -1,11 +1,14 @@
 package codeCraft.utils
 {
 
+	import com.demonsters.debugger.MonsterDebugger;
 	import com.greensock.TweenMax;
 	import com.greensock.easing.Back;
 	
 	import flash.display.MovieClip;
+	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.geom.Rectangle;
 	
 	import codeCraft.core.CodeCraft;
 	import codeCraft.debug.Debug;
@@ -31,8 +34,6 @@ package codeCraft.utils
 		public static var _elementosPosicion:Array;
 		/* Captura la posicion del elemento objetivo si es que tiene un elemento origen sobre el */
 		private static var _posicionElementoObjetivo:int;
-		/* Almacena la posicion mimina y maxima del eje x para indicar la region en la que el elemento en movimiento sera restaurado a la posicion origen*/
-		private static var _limiteMovimiento:Array;
 		/* Almacena el elemento actual que se esta moviendo */
 		private static var _elementoMovimientoActivo:*;
 		/* distancia entre elementos y cantidad de columnas que se vana a ubicar */
@@ -45,6 +46,8 @@ package codeCraft.utils
 		private static var _funcionesRetornar:Array;
 		/* Almacena un array con valores Booleanos que corresponden a la cantidad de elementos objetivos de la colision, true indica que colisiono con el correcto y false con el malo */
 		private static var _resultadoColision:Array;
+		/* rectangulo que indica el area de colision para devolver */
+		private static var _clipRetorno:Sprite;
 
 		/**
 		 * 
@@ -63,14 +66,12 @@ package codeCraft.utils
 			_elementosObjetivo = elementosObjetivo;
 			_elementosMover = elementosMover;
 			_elementosPosicion = elementosPosicion;
-			_limiteMovimiento = areaRetorno;
 			_botonComparacion = botonComparacion;
 			_textosVerificacion = textosVerificacion;
 			_opcionesAddChild = opcionesAddChild;
 			_posiciones = posicionelementos;
 			_almacenarTextosVerificacion = new Array();
 			_funcionesRetornar = funcionesRetornar;
-			_detectarColision = Arrays.fill(false,_elementosMover.length);
 			//se verifican las opciones de addchild
 			if(_opcionesAddChild == null)
 			{
@@ -95,6 +96,27 @@ package codeCraft.utils
 					_opcionesAddChild[3] = 20;
 				}
 			}
+			//se crea el elemento de limite
+			if(areaRetorno != null && areaRetorno.length == 4)
+			{
+				//se verifica si tiene todos los parametros, eje x y y, y el ahcno y largo
+				if(Arrays.verifyType(areaRetorno,Number))
+				{
+					_clipRetorno = new Sprite();
+					_clipRetorno.graphics.beginFill(0x000000, 1);
+					_clipRetorno.graphics.drawRect(areaRetorno[0],areaRetorno[1],areaRetorno[2],areaRetorno[3]);
+					_clipRetorno.alpha = 0;
+					CodeCraft.addChild(_clipRetorno,null);
+				}
+				else
+				{
+					_clipRetorno = null;
+				}
+			}
+			else
+			{
+				_clipRetorno = null;
+			}
 			cargarElementos();
 			listenerMovimientoDrag();
 		}
@@ -105,6 +127,7 @@ package codeCraft.utils
 			{
 				eliminarListenerMovimientoDrag();
 				eliminarElementos();
+				CodeCraft.removeChild(_clipRetorno);
 			}
 		}
 
@@ -165,6 +188,7 @@ package codeCraft.utils
 				objetivo = _elementosPosicion;
 			}
 			_resultadoColision = Arrays.fill(false,objetivo.length);
+			_detectarColision = Arrays.fill(false,objetivo.length);
 		}
 
 		private static function eliminarElementos():void
@@ -176,7 +200,7 @@ package codeCraft.utils
 			_elementosObjetivo = null;
 			_elementosMover = null;
 			_elementosPosicion = null;
-			_limiteMovimiento = null;
+			_clipRetorno = null;
 			_botonComparacion = null;
 			_posiciones = null;
 		}
@@ -238,19 +262,26 @@ package codeCraft.utils
 			Events.removeListener(CodeCraft.getMainObject().stage,MouseEvent.MOUSE_UP, ubicarElementoMovimientoSoltado,false);
 			//captura la posicion del array del elemento para poder manipular posicion en los arrays
 			var posicionBoton:int = Arrays.indexOf(_elementosMover,_elementoMovimientoActivo);
+			//indicara si se devolvio o no el objeto para verificar su posicion
+			var elementoDevuelto:Boolean = false;
 			//se verifica si el elemento lo devolvieron a la columna inicial
-			if(CodeCraft.getMainObject().mouseX > _limiteMovimiento[0] && CodeCraft.getMainObject().mouseX < _limiteMovimiento[1])
+			if(_clipRetorno != null && CodeCraft.getMainObject().contains(_clipRetorno))
 			{
-				_elementoMovimientoActivo.x = _posicionElementosMoverOrigen[posicionBoton][0];
-				_elementoMovimientoActivo.y = _posicionElementosMoverOrigen[posicionBoton][1];
-				if(_posicionElementoObjetivo != -1)
+				if(_clipRetorno.hitTestPoint(CodeCraft.getMainObject().mouseX, CodeCraft.getMainObject().mouseY))
 				{
-					_detectarColision[_posicionElementoObjetivo] = false;
-					_almacenarTextosVerificacion[_posicionElementoObjetivo] = "";
-					_posicionElementoObjetivo = -1;
+					_elementoMovimientoActivo.x = _posicionElementosMoverOrigen[posicionBoton][0];
+					_elementoMovimientoActivo.y = _posicionElementosMoverOrigen[posicionBoton][1];
+					if(_posicionElementoObjetivo != -1)
+					{
+						_detectarColision[_posicionElementoObjetivo] = false;
+						_almacenarTextosVerificacion[_posicionElementoObjetivo] = "";
+						_posicionElementoObjetivo = -1;
+					}
+					elementoDevuelto = true;
 				}
 			}
-			else
+			
+			if(elementoDevuelto == false)
 			{
 				//Como no se devolvio el elemento se recorre el array de objetivos para detectar una colision
 				for(var i:int = 0; i < _elementosObjetivo.length; i++)
@@ -267,7 +298,7 @@ package codeCraft.utils
 									_detectarColision[i] = false;
 									_elementosMover[j].x = _posicionElementosMoverOrigen[j][0];
 									_elementosMover[j].y = _posicionElementosMoverOrigen[j][1];
- 								}
+	 							}
 							}
 						}
 						if(_elementosPosicion != null)
@@ -298,6 +329,7 @@ package codeCraft.utils
 					}
 				}
 			}
+			
 			//se recorre el array que detecta si se cargo un elemento a los objetivos de colision, si todos los objetivos
 			//tienen un elemento cargado  se habilita el boton para verificar si la información es correcta
 			if(Arrays.verifyFill(_detectarColision,true))

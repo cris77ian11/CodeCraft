@@ -21,28 +21,35 @@ package codeCraft.debug{
 		public static var statsAdded:Boolean = false;
 		private static var frameCurrent:int = 0;
 		
-		public function initializeMonster():void{
-			MonsterDebugger.initialize(this);
-		}
+		/* Indicara si se encuentra activado el modo de depuracion y se permite la opcion de imprimir los mensajes */
+		public static var traceActivos:Boolean = false;
 		
-		public static function initialize ():void{
+		public static function initialize (activarTraces:Boolean = false):void
+		{
 			MonsterDebugger.initialize(CodeCraft.getMainObject());
 			stats = new Stats();
 			CodeCraft.addChild(stats);
 			statsAdded = true;
 			Events.listener(CodeCraft.getMainObject(),Event.ENTER_FRAME, detectChangeFrameMainObject);
+			//se le indica si se quiere usar o no los traces de la codecraft para imprmir mensajes de 
+			//errores, fallas o malos usos de la libreria
+			traceActivos = activarTraces;
 		}
 		
-		public static function stop():void{
+		public static function stop():void
+		{
 			CodeCraft.removeChild(stats);
 			statsAdded = false;
 			Events.removeListener(CodeCraft.getMainObject(),Event.ENTER_FRAME, detectChangeFrameMainObject);
 		}
 		
-		private static function detectChangeFrameMainObject(event:Event):void {
-			if(CodeCraft.getMainObject().currentFrame != frameCurrent){
+		private static function detectChangeFrameMainObject(event:Event):void 
+		{
+			if(CodeCraft.getMainObject().currentFrame != frameCurrent)
+			{
 				frameCurrent = CodeCraft.getMainObject().currentFrame;
-				if (CodeCraft.getMainObject().contains(stats)) {
+				if (CodeCraft.getMainObject().contains(stats)) 
+				{
 					CodeCraft.getMainObject().removeChild(stats);
 					CodeCraft.getMainObject().addChild(stats);
 				}
