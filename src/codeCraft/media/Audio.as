@@ -356,7 +356,7 @@ package codeCraft.media
 				}
 				else 
 				{
-					Debug.print("La funcion a retornar presenta errores, verifique que no sea null","Audio.playComplete","Falla CodeCraft");
+					//Debug.print("La funcion a retornar presenta errores, verifique que no sea null","Audio.playComplete","Falla CodeCraft");
 				}			
 			}
 		}
@@ -425,7 +425,7 @@ package codeCraft.media
 		
 		private static function errorLoadSound(event:IOErrorEvent):void 
 		{
-			Debug.print("Verifique la url del audio, al parecer no existe tal ruta.","Audio.playAudio","Falla CodeCraft ");
+			//Debug.print("Verifique la url del audio, al parecer no existe tal ruta.","Audio.playAudio","Falla CodeCraft ");
 		}
 		
 		
