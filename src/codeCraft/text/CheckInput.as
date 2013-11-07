@@ -157,7 +157,7 @@ package codeCraft.text
 		private static function comprobarInputs(event:MouseEvent):void
 		{
 			var contadorCorrectas:int = 0;
-			var contadorCorrectasIncorrectas:int = 0;
+			var contadorIncorrectas:int = 0;
 			for (var i:int = 0; i < _textosCorrectos.length; i++)
 			{
 				//si la caja de texto esta vacia me la marca  de color rojo y no valida
@@ -172,6 +172,7 @@ package codeCraft.text
 					if (String(_textosCorrectos[i]).toUpperCase() == String(_cajasInputTexto[i].text).toUpperCase())
 					{
 						//si la opcion es correcta
+						contadorCorrectas++;
 						_cajasInputTexto[i].textColor = 0x028901;
 						_cajasInputTexto[i].mouseEnabled = false;
 						_cajasInputTexto[i].selectable = false;
@@ -183,6 +184,7 @@ package codeCraft.text
 						//Opciones malas
 						//Restaura el contador a 0 para que no entre a la comprobacion final
 						_buenos = 0;
+						contadorIncorrectas++;
 						_cajasInputTexto[i].textColor = 0xC40000;
 						_cajasInputTexto[i].tabIndex = i;
 					}
@@ -200,7 +202,8 @@ package codeCraft.text
 					funcionTemporal();
 				}
 				//se verifica si gano o perdio la actividad
-				if(contadorCorrectas == 8)
+				trace(contadorCorrectas);
+				if(contadorCorrectas == _textosCorrectos.length)
 				{
 					//gano, por lo que se verifica si hay funcion de gano para devolver
 					if(_funcionesRetornar[1] != undefined && _funcionesRetornar[1] != null)
@@ -209,7 +212,8 @@ package codeCraft.text
 						funcionTemporal();
 					}
 				}
-				if(contadorCorrectasIncorrectas > 0)
+				trace(contadorIncorrectas);
+				if(contadorIncorrectas > 0)
 				{
 					//perdio y se verifica si hay funcion que devolver
 					if(_funcionesRetornar[2] != undefined && _funcionesRetornar[2] != null)
