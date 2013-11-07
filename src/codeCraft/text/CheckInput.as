@@ -156,6 +156,8 @@ package codeCraft.text
 		
 		private static function comprobarInputs(event:MouseEvent):void
 		{
+			var contadorCorrectas:int = 0;
+			var contadorCorrectasIncorrectas:int = 0;
 			for (var i:int = 0; i < _textosCorrectos.length; i++)
 			{
 				//si la caja de texto esta vacia me la marca  de color rojo y no valida
@@ -166,8 +168,6 @@ package codeCraft.text
 				}
 				else
 				{
-					trace(String(_textosCorrectos[0]).toUpperCase());
-					trace(String(_cajasInputTexto[i].text).toUpperCase());
 					//valida todas las cajas de texto con el array que contiene las  respuestas correctas, _textosCorrectos
 					if (String(_textosCorrectos[i]).toUpperCase() == String(_cajasInputTexto[i].text).toUpperCase())
 					{
@@ -200,8 +200,7 @@ package codeCraft.text
 					funcionTemporal();
 				}
 				//se verifica si gano o perdio la actividad
-				trace(contadorCorrectas);
-				if(contadorCorrectas==8)
+				if(contadorCorrectas == 8)
 				{
 					//gano, por lo que se verifica si hay funcion de gano para devolver
 					if(_funcionesRetornar[1] != undefined && _funcionesRetornar[1] != null)
@@ -210,7 +209,7 @@ package codeCraft.text
 						funcionTemporal();
 					}
 				}
-				if(incontadorCorrectas>0)
+				if(contadorCorrectasIncorrectas > 0)
 				{
 					//perdio y se verifica si hay funcion que devolver
 					if(_funcionesRetornar[2] != undefined && _funcionesRetornar[2] != null)
