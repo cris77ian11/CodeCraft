@@ -221,7 +221,7 @@ package codeCraft.utils
 						funcionTemporal();
 					}
 				}
-				else 
+				else
 				{
 					//perdio y se verifica si hay funcion que devolver
 					if(_funcionesRetornar[2] != undefined && _funcionesRetornar[2] != null)
