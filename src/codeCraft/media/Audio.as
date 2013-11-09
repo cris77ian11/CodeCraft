@@ -39,6 +39,8 @@ package codeCraft.media
 		/* Indicaran si los canales del audio estan activos o no lo estan */
 		private static var _channelPresentationActive:Boolean = false;
 		private static var _channelBackgroundActive:Boolean = false;
+		/* Indicara si se a dado la orden al audio de fondo de reproducir indefinidamente */
+		private static var _loopAudioBackground:Boolean = false;;
 		
 		/* Almacenara el movieclip que es cargado como boton de audio de fondo en el menu */
 		
@@ -264,7 +266,8 @@ package codeCraft.media
 			var numberLoop:int = 0;
 			if(loopSound)
 			{
-				numberLoop = 100;
+				numberLoop = -1;
+				_loopAudioBackground = true;
 			}
 			try
 			{
@@ -298,6 +301,10 @@ package codeCraft.media
 						_channelBackground = _audio.play(position,numberLoop);
 						_channelBackground.soundTransform = _soundTransformBackground;
 						_channelBackgroundActive = true;
+						if(_loopAudioBackground)
+						{
+							_channelBackground.addEventListener(Event.SOUND_COMPLETE,repetirSonidoFondo);
+						}
 						//_channelBackground.addEventListener(Event.SOUND_COMPLETE,soundChannelComplete);
 					}
 					else 
@@ -442,6 +449,18 @@ package codeCraft.media
 			//Debug.print("Verifique la url del audio, al parecer no existe tal ruta.","Audio.playAudio","Falla CodeCraft ");
 		}
 		
+		
+		private static function repetirSonidoFondo(event:Event):void 
+		{
+			if(_loopAudioBackground)
+			{
+				playAudio(_soundBackground,1,_loopAudioBackground);
+			}
+			else
+			{
+				_channelBackground.removeEventListener(Event.SOUND_COMPLETE,repetirSonidoFondo);
+			}
+		}
 		
 	}
 }

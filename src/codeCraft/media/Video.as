@@ -18,6 +18,8 @@ package codeCraft.media
 		private static var loaderContextYouTube:LoaderContext = new LoaderContext();
 		private static var _posicionYouTube:Array;
 		private static var _tamanoYoutube:Array;
+		/* Indicara si se a cargado un video o no */
+		private static var _videoYouTubeCargado:Boolean = false;
 		
 		/**
 		 * 
@@ -27,6 +29,7 @@ package codeCraft.media
 		 */
 		public static function loadYouTube(video:String, playerSize:Array = null, positionPlayer:Array = null):void
 		{
+			_videoYouTubeCargado = true;
 			loaderYouTube = new Loader();
 			_posicionYouTube = positionPlayer;
 			_tamanoYoutube = playerSize;
@@ -48,9 +51,14 @@ package codeCraft.media
 		
 		public static function removeYoutube():void
 		{
-			if(CodeCraft.getMainObject().contains(loaderYouTube))
+			if(_videoYouTubeCargado)
 			{
-				CodeCraft.removeChild(loaderYouTube);	
+				_videoYouTubeCargado = false;
+				reproductorYouTube.stopVideo();
+				reproductorYouTube.clearVideo();
+				CodeCraft.removeChild(loaderYouTube);
+				loaderYouTube.content.removeEventListener("onReady", reproduccionYouTube);
+				loaderYouTube.content.removeEventListener("onError", errorYouTube);
 			}
 		}
 		

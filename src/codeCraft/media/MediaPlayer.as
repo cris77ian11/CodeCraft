@@ -94,6 +94,7 @@ package codeCraft.media
 			//se comprueba que el elemento ya haya sido creado
 			if (_container != null)
 			{
+				Audio.setVolumenBackground(1);
 				Events.removeListener(_buttonSound,MouseEvent.CLICK, clicSound,true);
 				//se verifica si es visible para hacer la animacion que lo oculta
 				if(_container.visible)

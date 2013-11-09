@@ -237,7 +237,11 @@
 									}
 									catch(error:Error)
 									{
-										Debug.print("El label no existe.","CodeCraft.stopFrame","Falla CodeCraft ");
+										//se verifica si esta activa la opcion de depuraacion
+										if(Debug.traceActivos)
+										{
+											Debug.print("El label no existe.","CodeCraft.stopFrame","Falla CodeCraft ");
+										}
 									}
 								}
 							}
@@ -255,7 +259,11 @@
 			}
 			catch (error:Error)
 			{
-				Validation.error('El object de la funcion stopFrame no es un elemento valido');
+				//se verifica si esta activa la opcion de depuraacion
+				if(Debug.traceActivos)
+				{
+					Validation.error('El object de la funcion stopFrame no es un elemento valido');
+				}
 			}
 		}
 
