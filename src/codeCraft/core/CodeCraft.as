@@ -140,30 +140,22 @@
 			}
 		}
 
-		public static function getChildren (parent:*, frame:int = 0, nivel:int = 1):Array
+		public static function getChildren (parent:*, frame:int = 0):Array
 		{
-			var arrayChildren:Array;
-			if(parent is MovieClip && parent != null)
+			var arrayChildren:Array = new Array();
+			if(parent is Object || parent is MovieClip)
 			{
-				if(frame != 0) 
+				if(frame != 0)
 				{
-					parent.gotoAndStop(frame);
-				} 
-				for(var i:int = 0; i < parent.numChildren; i++)
+					parent.gotoAndStop(frame)
+				}
+				for(var i:uint = 0; i < parent.numChildren; i++)
 				{
-					if(parent.getChildAt(i) is MovieClip  && parent.getChildAt(i) != null)
-					{
-						var object:* = parent.getChildAt(i);
-						arrayChildren.push(object);
-						if(nivel == 0)
-						{
-							var arrayTemporal:Array = getChildren(object,frame,nivel);
-							arrayChildren.push(arrayTemporal);					
-						}
-					}
+					var object:* = parent.getChildAt(i);
+					arrayChildren.push(object);
 				}
 			}
-			else
+			else 
 			{
 				//Validation.error('El elemento parent de getChildren no es un Object o movieClip por lo que no se puede obtener los children');
 			}

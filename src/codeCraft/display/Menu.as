@@ -159,6 +159,7 @@ package codeCraft.display
 			CodeCraft.addChild(_containerMenuOptions,null,_positionMenuOptions);
 			CodeCraft.optionsMenu = _containerMenuOptions;
 			CodeCraft.optionsMenuLoaded = true;
+			listenerOptionsMenu();
 		}
 		
 		public static function listenerOptionsMenu ():void 

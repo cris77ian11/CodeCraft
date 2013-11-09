@@ -40,11 +40,13 @@ package codeCraft.text
 		{
 			_cajasInputTexto = casjasInputsTexto;
 			_textosCorrectos = textosCorrectos;
-			Debug.print(_textosCorrectos);
 			_limiteCaracteres = limiteCaracteres;
 			_botonComprobar = botonComprobar;
 			_funcionesRetornar = funcionesRetornar;
-			configurar();
+			if(_cajasInputTexto != null  && _textosCorrectos != null)
+			{
+				configurar();
+			}
 		}
 		
 		/**
@@ -61,7 +63,6 @@ package codeCraft.text
 		
 		private static function configurar():void
 		{
-			Events.listener(_botonComprobar, MouseEvent.CLICK, comprobarInputs)
 			//Configuramos las restricciones de las cajas.
 			for (var i:int = 0; i < _cajasInputTexto.length; i++)
 			{
@@ -84,6 +85,7 @@ package codeCraft.text
 			Events.listener(_cajasInputTexto, FocusEvent.FOCUS_OUT, activar);
 			Events.listener(_cajasInputTexto, FocusEvent.FOCUS_IN, capturaFoco);
 			Events.listener(_cajasInputTexto, MouseEvent.CLICK, cambiarFoco, false, false);
+			Events.listener(_botonComprobar, MouseEvent.CLICK, comprobarInputs);
 		}
 		
 		private static function eliminarListener():void
@@ -91,6 +93,7 @@ package codeCraft.text
 			Events.removeListener(_cajasInputTexto, FocusEvent.FOCUS_OUT, activar);
 			Events.removeListener(_cajasInputTexto, FocusEvent.FOCUS_IN, capturaFoco);
 			Events.removeListener(_cajasInputTexto, MouseEvent.CLICK, cambiarFoco, false);
+			Events.removeListener(_botonComprobar, MouseEvent.CLICK, comprobarInputs);
 		}
 		
 		private static function cambiarFoco(event:MouseEvent):void
@@ -202,7 +205,6 @@ package codeCraft.text
 					funcionTemporal();
 				}
 				//se verifica si gano o perdio la actividad
-				trace(contadorCorrectas);
 				if(contadorCorrectas == _textosCorrectos.length)
 				{
 					//gano, por lo que se verifica si hay funcion de gano para devolver
@@ -212,7 +214,6 @@ package codeCraft.text
 						funcionTemporal();
 					}
 				}
-				trace(contadorIncorrectas);
 				if(contadorIncorrectas > 0)
 				{
 					//perdio y se verifica si hay funcion que devolver
