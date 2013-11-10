@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<actionScriptProperties analytics="false" mainApplicationPath="CodeCraft.as" projectUUID="a163a311-8002-4e40-b127-a44fd503f7cc" version="11">
+<actionScriptProperties analytics="false" mainApplicationPath="CodeCraft.as" projectUUID="36f9b17d-681e-4f36-8fa5-e77733730821" version="11">
   <compiler additionalCompilerArguments="-locale en_US" autoRSLOrdering="true" copyDependentFiles="false" fteInMXComponents="false" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" useFlashSDK="false" verifyDigests="true" warn="true">
     <compilerSourcePath>
-      <compilerSourcePathEntry kind="1" linkType="1" path="C:/AS3/src"/>
       <compilerSourcePathEntry kind="1" linkType="1" path="C:/AS3/greensock-as3"/>
+      <compilerSourcePathEntry kind="1" linkType="1" path="C:/AS3/src"/>
     </compilerSourcePath>
     <libraryPath defaultLinkType="0">
       <libraryPathEntry kind="4" path="">

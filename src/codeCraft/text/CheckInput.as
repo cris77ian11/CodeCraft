@@ -194,7 +194,6 @@ package codeCraft.text
 				}
 				
 			}
-			
 			//se verifica si hay funciones qeu devolver
 			if(_funcionesRetornar != null)
 			{

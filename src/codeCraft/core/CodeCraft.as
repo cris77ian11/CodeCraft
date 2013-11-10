@@ -120,7 +120,8 @@
 			}
 			catch(e:Error)
 			{
-				Debug.print("Error al momento de realizar la precarga del contenido.","CodeCraft.preloadUpdate","Error CodCraft ");
+				Debug.print("Error al momento de realizar la precarga del contenido.\n Verificique que un elemento no tenga la vinculacion AS y a la vez sea utilizado con instancias de movieclip en la linea de tiempo, puede que este duplicado la instancias, vinculacion AS de la biblioteca o variables del movieclip.","CodeCraft.preloadUpdate","Error CodCraft ");
+				Debug.print("Ruta Error: \n" + e.getStackTrace(),"CodeCraft.preloadUpdate","Error CodCraft ");
 			}
 		}
 

@@ -309,12 +309,15 @@ package codeCraft.core {
 				{
 					//0 indica que es la funcion antes de que cambie el fotograma
 					functionTemp = navigation['functionChangeFrame'][0];
-					functionTemp();						
 				}
 				else
 				{
 					functionTemp = navigation['functionChangeFrame'];
-					functionTemp();	
+				}
+				//se verifica si hay y se carga la funcion
+				if(functionTemp != null)
+				{
+					functionTemp();
 				}
 			}
 			soundForAnimation = true;
@@ -339,12 +342,15 @@ package codeCraft.core {
 				{
 					//1 indica que es la funcion despues de que cambia el fotograma
 					functionTemp = navigation['functionChangeFrame'][1];
-					functionTemp();	
 				}
 				else
 				{
 					functionTemp = navigation['functionChangeFrame'];
-					functionTemp();	
+				}
+				//se verifica si tiene funcion a la cual llamar
+				if(functionTemp != null)
+				{
+					functionTemp();
 				}
 			}
 			checkNavigation (navigation['buttonLeft'], navigation['buttonRight'], navigation['container'].currentFrame, navigation['container'].totalFrames);
