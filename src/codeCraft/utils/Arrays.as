@@ -277,6 +277,19 @@ package codeCraft.utils {
 				return null;
 			}
 		}
+		
+		public static function reload(array:Array):Array 
+		{
+			var arrayTemporal:Array = new Array();
+			for(var i:int = 0; i < array.length; i++)
+			{
+				if(array[i] != undefined || array[i] != null)
+				{
+					arrayTemporal.push(array[i]);
+				}
+			}
+			return arrayTemporal;
+		}
 
 	}
 }

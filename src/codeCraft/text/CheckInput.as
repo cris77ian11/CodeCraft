@@ -69,7 +69,7 @@ package codeCraft.text
 				//indica la cantidad de caracteres maximos que puede tener
 				_cajasInputTexto[i].maxChars = _limiteCaracteres;
 				//indica las palabras qeu solo se permiten ingresar
-				_cajasInputTexto[i].restrict = "A-z";
+				_cajasInputTexto[i].restrict = "A-z ";
 				//indica el orden del tabulador 
 				_cajasInputTexto[i].tabIndex = i;
 				_cajasInputTexto[i].addEventListener(FocusEvent.FOCUS_OUT, activar);
@@ -163,6 +163,7 @@ package codeCraft.text
 			var contadorIncorrectas:int = 0;
 			for (var i:int = 0; i < _textosCorrectos.length; i++)
 			{
+				_cajasInputTexto[i].text = trimChar(_cajasInputTexto[i].text);
 				//si la caja de texto esta vacia me la marca  de color rojo y no valida
 				if (_cajasInputTexto[i].text == "")
 				{
@@ -235,6 +236,19 @@ package codeCraft.text
 			{
 				event.preventDefault();
 			}
+		}
+		
+		/**
+		 * Elimina los espacios al inicio i final de un caracter
+		 */
+		private static function trimChar(p_string:String, p_char:String = ' '):String
+		{
+			if (!p_string)
+			{
+				return '';
+			}
+			var regexp:RegExp = new RegExp("^" + p_char + "+|" + p_char + "+$", "g");
+			return p_string.replace(regexp, '');
 		}
 	
 	}
