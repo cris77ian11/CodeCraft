@@ -375,6 +375,8 @@ package codeCraft.core {
 			{
 				Events.removeListener(CodeCraft.getMainObject(),Event.ENTER_FRAME, detectChangeFrame);
 				Audio.stopSoundPresentation();
+				_soundActive = false;
+				arraySounds = null;
 			}
 		}
 		

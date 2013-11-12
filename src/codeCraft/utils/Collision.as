@@ -220,6 +220,15 @@ package codeCraft.utils
 			if(_elementosObjetivosMultiple != null)
 			{
 				_elementosCargadosObjetivo = new  Array();
+				//se verifica se permite la carga de elementos multiples a un solo objetivo para modificar la cantidad de resultados de colision
+				_resultadoColision = new Array();
+				for (var i:int = 0; i < _elementosObjetivosMultiple.length; i++)
+				{
+					for(var j:int = 0; j < _elementosObjetivosMultiple[i].length; j++)
+					{
+						_resultadoColision.push(false);	
+					}
+				}
 			}
 		}
 
@@ -649,6 +658,14 @@ package codeCraft.utils
 			}
 			CodeCraft.stopFrame(_elementosMover,"normal");
 			CodeCraft.stopFrame(_elementosObjetivo,"normal");
+			//se crea una variable para aumentar y almacenar el resultado de las respuestas pero de ser mayor el 
+			//numero de elementos cargados al numero permitido no se ejecuta la opcion
+			var posicionRespuesta:int = -1;
+			if (_elementosCargadosObjetivo.length <= _resultadoColision.length)
+			{
+				posicionRespuesta = 0;
+				_resultadoColision = Arrays.fill(false,_resultadoColision.length);
+			}
 			for (var i:int = 0; i < objetoColision.length; i++)
 			{
 				var estadoRespuesta:Boolean = false;
@@ -660,6 +677,16 @@ package codeCraft.utils
 					if(posicion != -1)
 					{
 						CodeCraft.stopFrame(_elementosCargadosObjetivo[i][posicion],"bien");
+						if(posicionRespuesta != -1)
+						{
+							_resultadoColision[posicionRespuesta] = true;
+						}
+					}
+					//se verifica si se permite la opcion para rellenar el array con el estado de las respuestas
+					//y se aumenta el valor del array
+					if(posicionRespuesta != -1)
+					{
+						posicionRespuesta += 1;
 					}
 				}
 			}
