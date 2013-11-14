@@ -46,6 +46,10 @@ package codeCraft.media
 		 */
 		public static function load (buttonSound:MovieClip,containerMediaPlayer:MovieClip, buttonPlay:MovieClip, buttonPrev:MovieClip, buttonNext:MovieClip, progressBar:MovieClip, controlBar:MovieClip, position:Array = null, functionReturn:Function = null):void
 		{
+			if (_container != null)
+			{
+				remove();
+			}
 			_buttonSound = buttonSound;
 			_container = containerMediaPlayer;
 			_buttonPlay = buttonPlay;
@@ -376,6 +380,7 @@ package codeCraft.media
 		 */
 		private static function removeComplete():void
 		{
+			
 			Events.removeListener(_buttonPlay,MouseEvent.CLICK, clicPlay,true);
 			Events.removeListener(_botonRetroceder,MouseEvent.MOUSE_DOWN, prevDown,true);
 			Events.removeListener(_botonAdelantar,MouseEvent.MOUSE_DOWN, nextDown,true);
@@ -384,6 +389,7 @@ package codeCraft.media
 			Events.removeListener(_botonAdelantar,MouseEvent.MOUSE_UP, nextDown,true);
 			Events.removeListener(_barraControl,MouseEvent.MOUSE_UP, barDown,true);
 			Events.removeListener(_container,Event.ENTER_FRAME, soundProgress);
+			_barraProgreso.scaleX = 0;
 			CodeCraft.removeChild(_container);
 			_botonAdelantar = null;
 			_buttonPlay = null;
@@ -391,6 +397,10 @@ package codeCraft.media
 			_buttonSound = null;
 			_container = null;
 			_sound = null;
+			_barraProgreso = null;
+			_channelSound = null;
+			_barraControl = null;
+			_functionReturn = null;
 		}
 
 		private static function detenerAudio():void
