@@ -143,24 +143,31 @@
 
 		public static function getChildren (parent:*, frame:int = 0):Array
 		{
-			var arrayChildren:Array = new Array();
-			if(parent is Object || parent is MovieClip)
+			if(mainObject != null)
 			{
-				if(frame != 0)
+				var arrayChildren:Array = new Array();
+				if(parent is Object || parent is MovieClip)
 				{
-					parent.gotoAndStop(frame)
+					if(frame != 0)
+					{
+						parent.gotoAndStop(frame)
+					}
+					for(var i:uint = 0; i < parent.numChildren; i++)
+					{
+						var object:* = parent.getChildAt(i);
+						arrayChildren.push(object);
+					}
 				}
-				for(var i:uint = 0; i < parent.numChildren; i++)
+				else 
 				{
-					var object:* = parent.getChildAt(i);
-					arrayChildren.push(object);
+					//Validation.error('El elemento parent de getChildren no es un Object o movieClip por lo que no se puede obtener los children');
 				}
+				return arrayChildren;
 			}
-			else 
+			else
 			{
-				//Validation.error('El elemento parent de getChildren no es un Object o movieClip por lo que no se puede obtener los children');
+				return null;
 			}
-			return arrayChildren;
 		}
 
 		public static function store(object:Object, cantidad:Number = 1, nameObject:String = "clip_"):Array

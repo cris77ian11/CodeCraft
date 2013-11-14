@@ -7,6 +7,7 @@ package codeCraft.utils
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.sampler.NewObjectSample;
 	
 	import codeCraft.core.CodeCraft;
 	import codeCraft.debug.Debug;
@@ -155,6 +156,10 @@ package codeCraft.utils
 				eliminarListenerMovimientoDrag();
 				eliminarElementos();
 				CodeCraft.removeChild(_clipRetorno);
+				_elementosCargadosObjetivo = null;
+				_copiaElementosMover = null;
+				_elementosObjetivosMultiple = null;
+				_clipRetorno = new Sprite();
 			}
 		}
 
@@ -217,9 +222,9 @@ package codeCraft.utils
 			_resultadoColision = Arrays.fill(false,objetivo.length);
 			_detectarColision = Arrays.fill(false,objetivo.length);
 			//se verifica si hay habilitada la opcion de envedir elementos para crear el array que se encarga de crearlos
+			_elementosCargadosObjetivo = new  Array();
 			if(_elementosObjetivosMultiple != null)
-			{
-				_elementosCargadosObjetivo = new  Array();
+			{	
 				//se verifica se permite la carga de elementos multiples a un solo objetivo para modificar la cantidad de resultados de colision
 				_resultadoColision = new Array();
 				for (var i:int = 0; i < _elementosObjetivosMultiple.length; i++)
@@ -319,6 +324,8 @@ package codeCraft.utils
 			var posicionBoton:int = Arrays.indexOf(_elementosMover,_elementoMovimientoActivo);
 			//indicara si se devolvio o no el objeto para verificar su posicion
 			var elementoDevuelto:Boolean = false;
+			//almacenara la posicion de los elementos que se cargen en los objetivos
+			var posicionElementoCargado:int;
 			//se verifica si el elemento lo devolvieron a la columna inicial
 			if(_clipRetorno != null && CodeCraft.getMainObject().contains(_clipRetorno))
 			{
@@ -333,6 +340,12 @@ package codeCraft.utils
 						_posicionElementoObjetivo = -1;
 					}
 					elementoDevuelto = true;
+					//se busca el elemento en movimiento para verificar si ya fue cargado y se elimina del array
+					posicionElementoCargado = Arrays.indexOf(_elementosCargadosObjetivo,_elementoMovimientoActivo);
+					if(posicionElementoCargado != -1)
+					{
+						_elementosCargadosObjetivo.splice(posicionElementoCargado,1);
+					}
 				}
 			}
 			
@@ -353,9 +366,23 @@ package codeCraft.utils
 									_detectarColision[i] = false;
 									_elementosMover[j].x = _posicionElementosMoverOrigen[j][0];
 									_elementosMover[j].y = _posicionElementosMoverOrigen[j][1];
+									//verifica si el elemento esta dentro del array de elementos cargados y lo elimina
+									posicionElementoCargado = Arrays.indexOf(_elementosCargadosObjetivo,_elementosMover[j]);
+									if(posicionElementoCargado != -1)
+									{
+										_elementosCargadosObjetivo.splice(posicionElementoCargado,1);
+									}
 	 							}
 							}
 						}
+						posicionElementoCargado = Arrays.indexOf(_elementosCargadosObjetivo,_elementoMovimientoActivo);
+						while(posicionElementoCargado != -1)
+						{
+							_elementosCargadosObjetivo.splice(posicionElementoCargado,1);
+							posicionElementoCargado = Arrays.indexOf(_elementosCargadosObjetivo,_elementoMovimientoActivo);
+						}
+						//almacene el elemento en movimiento como un elemento cargado
+						_elementosCargadosObjetivo.push(_elementoMovimientoActivo);
 						if(_elementosPosicion != null)
 						{
 							_elementoMovimientoActivo.x = _elementosPosicion[i].x;
@@ -384,7 +411,6 @@ package codeCraft.utils
 					}
 				}
 			}
-			
 			//se recorre el array que detecta si se cargo un elemento a los objetivos de colision, si todos los objetivos
 			//tienen un elemento cargado  se habilita el boton para verificar si la información es correcta
 			if(Arrays.verifyFill(_detectarColision,true))
@@ -414,7 +440,9 @@ package codeCraft.utils
 				objetoColision = _elementosPosicion;
 			}
 			CodeCraft.stopFrame(_elementosObjetivo,"normal");
+			CodeCraft.stopFrame(objetoColision,"normal");
 			CodeCraft.stopFrame(_elementosMover,"normal");
+			CodeCraft.stopFrame(_elementosCargadosObjetivo,"mal");
 			//recorre un array con los elementos objetivos y verifica por el nombre de instancia de los elementos,
 			//leyendo el ultimo numero que indicara la posicion de los elementos en el array antes de desorndenarlos
 			//pero recorre el array de elementos en movimiento para detectar cual esta cargado al elemento objetivo.
@@ -423,23 +451,17 @@ package codeCraft.utils
 				nombreObjetivo = objetoColision[i].name.substr(objetoColision[i].name.length - 1);
 				labelsObjetivo = objetoColision[i].currentLabels;
 				//se busca el label mal y se carga si lo tiene
-				numeroLabelObjetivo = verificarLabels(labelsObjetivo,"mal");
+				/*numeroLabelObjetivo = verificarLabels(labelsObjetivo,"mal");
 				if(numeroLabelObjetivo != -1 && objetoColision[i].currentLabel != "bien")
 				{
 					objetoColision[i].gotoAndStop(labelsObjetivo[numeroLabelObjetivo].name);
 
-				}
+				}*/
 				for (var j:int = 0; j < _elementosMover.length; j++)
 				{
 					respuestaCorrecta = false;
 					nombreMovimiento = _elementosMover[j].name.substr(_elementosMover[j].name.length - 1);
 					labelsMovimiento = _elementosMover[j].currentLabels;
-					//se busca el label mal y se carga si lo tiene
-					numeroLabelMovimiento = verificarLabels(labelsMovimiento,"mal");
-					if(numeroLabelMovimiento != -1 && _elementosMover[j].currentLabel != "bien")
-					{
-						_elementosMover[j].gotoAndStop(labelsMovimiento[numeroLabelMovimiento].name);
-					}
 					//se comprueba si se activo la identificacion por medio de texto
 					if(_textosVerificacion != null)
 					{
@@ -478,16 +500,8 @@ package codeCraft.utils
 					if(respuestaCorrecta)
 					{
 						//se buscan las labels de ambos elementos para indicar cual es la buena si no la tiene no se carga
-						numeroLabelMovimiento = verificarLabels(labelsMovimiento,"bien");
-						if(numeroLabelMovimiento != -1)
-						{
-							_elementosMover[j].gotoAndStop(labelsMovimiento[numeroLabelMovimiento].name);
-						}
-						numeroLabelObjetivo = verificarLabels(labelsObjetivo,"bien");
-						if(numeroLabelObjetivo != -1)
-						{
-							objetoColision[i].gotoAndStop(labelsObjetivo[numeroLabelObjetivo].name);
-						}
+						CodeCraft.stopFrame(_elementosMover[j],"bien");
+						CodeCraft.stopFrame(objetoColision[i],"bien");
 						_resultadoColision[i] = true;
 						break;
 					}
