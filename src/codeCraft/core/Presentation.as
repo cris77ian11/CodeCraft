@@ -237,17 +237,18 @@ package codeCraft.core {
 		
 		private static function navigationButton(e:MouseEvent):void 
 		{
-			if (e.currentTarget == navigation['buttonLeft']) 
+			if (e.currentTarget == navigation['buttonLeft'] && navigation['container'].currentFrame > 1) 
 			{ 
 				//atras
 				moverPresentacion = false;
+				outAnimation();
 			}
-			else 
+			if(e.currentTarget == navigation['buttonRight'] && navigation['container'].currentFrame < navigation['container'].totalFrames) 
 			{ 
 				//adelante
 				moverPresentacion = true;
+				outAnimation();
 			}
-			outAnimation();
 		}
 		
 		private static function navigationKeyBoard(e:KeyboardEvent):void 
