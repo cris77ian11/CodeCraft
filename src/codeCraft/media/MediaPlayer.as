@@ -2,7 +2,7 @@ package codeCraft.media
 {
 	import com.greensock.TweenMax;
 	import com.greensock.easing.Back;
-
+	
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -11,7 +11,8 @@ package codeCraft.media
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	import flash.net.URLRequest;
-
+	import flash.sampler.NewObjectSample;
+	
 	import codeCraft.core.CodeCraft;
 	import codeCraft.debug.Debug;
 	import codeCraft.events.Events;
@@ -46,10 +47,6 @@ package codeCraft.media
 		 */
 		public static function load (buttonSound:MovieClip,containerMediaPlayer:MovieClip, buttonPlay:MovieClip, buttonPrev:MovieClip, buttonNext:MovieClip, progressBar:MovieClip, controlBar:MovieClip, position:Array = null, functionReturn:Function = null):void
 		{
-			if (_container != null)
-			{
-				remove();
-			}
 			_buttonSound = buttonSound;
 			_container = containerMediaPlayer;
 			_buttonPlay = buttonPlay;
@@ -58,6 +55,7 @@ package codeCraft.media
 			_barraProgreso = progressBar;
 			_barraControl = controlBar;
 			_functionReturn = functionReturn;
+			_currentPosition = 0;
 			//verificar si los elementos estan cargados en el stage de lo contrario cargarlos
 			if(_buttonSound != null)
 			{
@@ -88,16 +86,28 @@ package codeCraft.media
 				TweenMax.from(_container,0.7,{alpha: 0,scaleX: 0, scaleY: 0, ease: Back.easeOut, onComplete: showContainerComplete});
 			}
 		}
+		
+		public static function reload(ruta:* = null):void
+		{
+			detenerAudio();
+			_currentPosition = 0;
+			_barraProgreso.scaleX = 0;
+			if(ruta != null)
+			{
+				loadSound(ruta);	
+			}
+		}
 
 		/**
 		 * Elimina el rreproductor de musica
 		 */
 		public static function remove():void
 		{
-			_channelSound.stop();
 			//se comprueba que el elemento ya haya sido creado
 			if (_container != null)
 			{
+				detenerAudio();
+				_channelSound.stop();
 				Audio.setVolumenBackground(1);
 				Events.removeListener(_buttonSound,MouseEvent.CLICK, clicSound,true);
 				//se verifica si es visible para hacer la animacion que lo oculta
@@ -122,6 +132,7 @@ package codeCraft.media
 		{
 			if(ruta != null)
 			{
+				_channelSound = new SoundChannel();
 				var url:URLRequest = new URLRequest(ruta);
 				_sound = new Sound(url);
 				_sound.addEventListener(IOErrorEvent.IO_ERROR, errorLoadSound);
@@ -239,6 +250,7 @@ package codeCraft.media
 			if(event.type == "mouseDown")
 			{
 				_volumen = 0;
+				Audio.stopAllSound(false);
 				Events.listener(_botonRetroceder,Event.ENTER_FRAME, changeAudioPrev);
 			}
 			else
@@ -255,6 +267,7 @@ package codeCraft.media
 			if(event.type == "mouseDown")
 			{
 				_volumen = 0;
+				Audio.stopAllSound(false);
 				Events.listener(_botonAdelantar,Event.ENTER_FRAME, changeAudioNext);
 			}
 			else
@@ -302,6 +315,7 @@ package codeCraft.media
 				Events.listener(_container,Event.ENTER_FRAME, soundProgress);
 				Events.removeListener(_barraControl,Event.ENTER_FRAME, soundScrub);
 				Events.removeListener(CodeCraft.getMainObject().stage,MouseEvent.MOUSE_UP, barDown,true);
+				reproducirAudio();
 			}
 			changeVolumen();
 		}
@@ -335,6 +349,7 @@ package codeCraft.media
 		 */
 		private static function soundProgress(event:Event):void
 		{
+			
 			var loadTime:Number = _sound.bytesLoaded / _sound.bytesTotal;
 			var loadPercent:uint = Math.round(100 * loadTime);
 			var estimatedLength:int = Math.ceil(_sound.length / (loadTime));
@@ -380,7 +395,6 @@ package codeCraft.media
 		 */
 		private static function removeComplete():void
 		{
-			
 			Events.removeListener(_buttonPlay,MouseEvent.CLICK, clicPlay,true);
 			Events.removeListener(_botonRetroceder,MouseEvent.MOUSE_DOWN, prevDown,true);
 			Events.removeListener(_botonAdelantar,MouseEvent.MOUSE_DOWN, nextDown,true);
@@ -389,7 +403,6 @@ package codeCraft.media
 			Events.removeListener(_botonAdelantar,MouseEvent.MOUSE_UP, nextDown,true);
 			Events.removeListener(_barraControl,MouseEvent.MOUSE_UP, barDown,true);
 			Events.removeListener(_container,Event.ENTER_FRAME, soundProgress);
-			_barraProgreso.scaleX = 0;
 			CodeCraft.removeChild(_container);
 			_botonAdelantar = null;
 			_buttonPlay = null;

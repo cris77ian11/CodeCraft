@@ -335,6 +335,8 @@ package codeCraft.core {
 			{
 				navigation['container'].prevFrame();
 			}			
+			checkNavigation (navigation['buttonLeft'], navigation['buttonRight'], navigation['container'].currentFrame, navigation['container'].totalFrames);
+			storePresentation ();
 			//si tiene una funcion para cambio de fotograma la llama
 			if(navigation['functionChangeFrame'] != null)
 			{
@@ -354,8 +356,6 @@ package codeCraft.core {
 					functionTemp();
 				}
 			}
-			checkNavigation (navigation['buttonLeft'], navigation['buttonRight'], navigation['container'].currentFrame, navigation['container'].totalFrames);
-			storePresentation ();
 		}
 		
 		//cargar y eliminar los listner que hacen que sirva la presentacion
