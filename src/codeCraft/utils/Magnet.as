@@ -3,11 +3,11 @@ package codeCraft.utils
 
 	import com.greensock.TweenMax;
 	import com.greensock.easing.Back;
-
+	
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
-
+	
 	import codeCraft.core.CodeCraft;
 	import codeCraft.debug.Debug;
 	import codeCraft.events.Events;
@@ -182,6 +182,9 @@ package codeCraft.utils
 
 		private static function comprobarIman (event:MouseEvent):void
 		{
+			//se crea una variable para almacenar el estado de cada uno de los imagenes
+			//indicando si esta bueno con true, y si esta malo con false
+			var resultadoImanes:Array = new Array();
 			for(var i:int = 0; i < _elementosIman.length; i++)
 			{
 				for (var j:int = 0; j < _elementosIman[i].length; j++)
@@ -189,10 +192,42 @@ package codeCraft.utils
 					if(_elementosIman[i][j].texto.text == _textosIman[i][j])
 					{
 						CodeCraft.stopFrame(_elementosIman[i][j],"bien");
+						resultadoImanes.push(true);
 					}
 					else
 					{
 						CodeCraft.stopFrame(_elementosIman[i][j],"mal");
+						resultadoImanes.push(false);
+					}
+				}
+			}
+			
+			//se verifica si hay funciones qeu devolver
+			if(_funcionesRetornar != null)
+			{
+				var funcionTemporal:Function;
+				if(_funcionesRetornar[0] != undefined && _funcionesRetornar[0] != null)
+				{
+					funcionTemporal = _funcionesRetornar[0];
+					funcionTemporal();
+				}
+				//se verifica si gano o perdio la actividad
+				if(Arrays.verifyFill(resultadoImanes,true))
+				{
+					//gano, por lo que se verifica si hay funcion de gano para devolver
+					if(_funcionesRetornar[1] != undefined && _funcionesRetornar[1] != null)
+					{
+						funcionTemporal = _funcionesRetornar[1];
+						funcionTemporal();
+					}
+				}
+				else
+				{
+					//perdio y se verifica si hay funcion que devolver
+					if(_funcionesRetornar[2] != undefined && _funcionesRetornar[2] != null)
+					{
+						funcionTemporal = _funcionesRetornar[2];
+						funcionTemporal();
 					}
 				}
 			}

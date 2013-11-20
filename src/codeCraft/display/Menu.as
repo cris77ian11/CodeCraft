@@ -107,12 +107,12 @@ package codeCraft.display
 		
 		private static var _containerMenuOptions:MovieClip;
 		private static var _buttonSound:MovieClip;
-		private static var _buttonSoundBackground:MovieClip;
 		private static var _buttonFullScreen:MovieClip;
 		private static var _positionMenuOptions:Array;
 		/* Detecta el estado de la pantalla si esta normal false o en pantalla completa true */
 		private static var _fullScreenActive:Boolean = false;
-		
+		/* Boton o instancia que almacena el movieclip del audio de fondo, se utiliza para poder ser manipulado directamente desde la clase Audio */
+		public static var botonSonidoFondo:MovieClip = new MovieClip();
 		
 		/**
 		 * Carga el menu de las opciones de la presentacion, encargado de manejar la pantalla completa y el control del sonido
@@ -129,12 +129,11 @@ package codeCraft.display
 		{
 			_containerMenuOptions = container;
 			_buttonSound = sound;
-			_buttonSoundBackground = soundBackground;
+			botonSonidoFondo = soundBackground;
 			_buttonFullScreen = fullScreen;
 			//se verifica si el array de la posicion es null, si lo es se asigna un valor por defecto para ubicar el elmento container
 			if(position == null)
 			{
-				trace(1);
 				position = new Array(CodeCraft.getMainObject().stage.stageWidth - (container.width + 5), 5);
 			}
 			_positionMenuOptions = position;
@@ -148,20 +147,33 @@ package codeCraft.display
 			//se carga los listener para el boton de sonido
 			if(_buttonSound is MovieClip)
 			{
-				//el listener es redireccionado a la clase audio que es la encargada de manipular esto
-				Events.listener(_buttonSound,MouseEvent.CLICK, Audio.stopPresetation,true,true);
 				Button.over(_buttonSound,1,null,true);
 			}
 			//se carga el lisener para el boton del sonido 
-			if(_buttonSoundBackground is MovieClip)
+			if(botonSonidoFondo is MovieClip)
 			{
-				Events.listener(_buttonSoundBackground,MouseEvent.CLICK, Audio.stopBackground,true,true);
-				Button.over(_buttonSoundBackground,1,2,true);
+				Button.over(botonSonidoFondo,1,2,true);
 			}
 			
 			CodeCraft.addChild(_containerMenuOptions,null,_positionMenuOptions);
 			CodeCraft.optionsMenu = _containerMenuOptions;
 			CodeCraft.optionsMenuLoaded = true;
+			listenerOptionsMenu();
+		}
+		
+		public static function listenerOptionsMenu ():void 
+		{
+			Events.listener(botonSonidoFondo,MouseEvent.CLICK, Audio.stopBackground,true,true);
+			//el listener es redireccionado a la clase audio que es la encargada de manipular esto
+			Events.listener(_buttonSound,MouseEvent.CLICK, Audio.stopPresetation,true,true);
+		}
+		
+		
+		public static function removeListenerOptionsMenu ():void 
+		{
+			Events.removeListener(botonSonidoFondo,MouseEvent.CLICK, Audio.stopBackground,true);
+			//el listener es redireccionado a la clase audio que es la encargada de manipular esto
+			Events.removeListener(_buttonSound,MouseEvent.CLICK, Audio.stopPresetation,true);
 		}
 		
 		

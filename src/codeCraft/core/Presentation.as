@@ -237,17 +237,18 @@ package codeCraft.core {
 		
 		private static function navigationButton(e:MouseEvent):void 
 		{
-			if (e.currentTarget == navigation['buttonLeft']) 
+			if (e.currentTarget == navigation['buttonLeft'] && navigation['container'].currentFrame > 1) 
 			{ 
 				//atras
 				moverPresentacion = false;
+				outAnimation();
 			}
-			else 
+			if(e.currentTarget == navigation['buttonRight'] && navigation['container'].currentFrame < navigation['container'].totalFrames) 
 			{ 
 				//adelante
 				moverPresentacion = true;
+				outAnimation();
 			}
-			outAnimation();
 		}
 		
 		private static function navigationKeyBoard(e:KeyboardEvent):void 
@@ -309,12 +310,15 @@ package codeCraft.core {
 				{
 					//0 indica que es la funcion antes de que cambie el fotograma
 					functionTemp = navigation['functionChangeFrame'][0];
-					functionTemp();						
 				}
 				else
 				{
 					functionTemp = navigation['functionChangeFrame'];
-					functionTemp();	
+				}
+				//se verifica si hay y se carga la funcion
+				if(functionTemp != null)
+				{
+					functionTemp();
 				}
 			}
 			soundForAnimation = true;
@@ -331,6 +335,8 @@ package codeCraft.core {
 			{
 				navigation['container'].prevFrame();
 			}			
+			checkNavigation (navigation['buttonLeft'], navigation['buttonRight'], navigation['container'].currentFrame, navigation['container'].totalFrames);
+			storePresentation ();
 			//si tiene una funcion para cambio de fotograma la llama
 			if(navigation['functionChangeFrame'] != null)
 			{
@@ -339,16 +345,17 @@ package codeCraft.core {
 				{
 					//1 indica que es la funcion despues de que cambia el fotograma
 					functionTemp = navigation['functionChangeFrame'][1];
-					functionTemp();	
 				}
 				else
 				{
 					functionTemp = navigation['functionChangeFrame'];
-					functionTemp();	
+				}
+				//se verifica si tiene funcion a la cual llamar
+				if(functionTemp != null)
+				{
+					functionTemp();
 				}
 			}
-			checkNavigation (navigation['buttonLeft'], navigation['buttonRight'], navigation['container'].currentFrame, navigation['container'].totalFrames);
-			storePresentation ();
 		}
 		
 		//cargar y eliminar los listner que hacen que sirva la presentacion
@@ -356,19 +363,21 @@ package codeCraft.core {
 		{
 			Events.listener(navigation['buttonLeft'], MouseEvent.CLICK, navigationButton,true,true);
 			Events.listener(navigation['buttonRight'], MouseEvent.CLICK, navigationButton,true,true);
-			Events.listener(CodeCraft.getMainObject(),KeyboardEvent.KEY_DOWN, navigationKeyBoard);
-			Events.listener(navigation['container'], MouseEvent.CLICK, CodeCraft.focoNavigation,false);
+			Events.listener(CodeCraft.getMainObject().stage,KeyboardEvent.KEY_DOWN, navigationKeyBoard);
+			Events.listener(CodeCraft.getMainObject().stage, MouseEvent.CLICK, CodeCraft.focoNavigation,false);
 		}
 		private static function removeListenerPresentation ():void 
 		{
 			Events.removeListener(navigation['buttonLeft'], MouseEvent.CLICK, navigationButton);
 			Events.removeListener(navigation['buttonRight'], MouseEvent.CLICK, navigationButton);
-			Events.removeListener(CodeCraft.getMainObject(),KeyboardEvent.KEY_DOWN, navigationKeyBoard);
-			Events.removeListener(navigation['container'], MouseEvent.CLICK, CodeCraft.focoNavigation,false);
+			Events.removeListener(CodeCraft.getMainObject().stage,KeyboardEvent.KEY_DOWN, navigationKeyBoard);
+			Events.removeListener(CodeCraft.getMainObject().stage, MouseEvent.CLICK, CodeCraft.focoNavigation,false);
 			if(_soundActive)
 			{
 				Events.removeListener(CodeCraft.getMainObject(),Event.ENTER_FRAME, detectChangeFrame);
 				Audio.stopSoundPresentation();
+				_soundActive = false;
+				arraySounds = null;
 			}
 		}
 		

@@ -17,6 +17,7 @@ package codeCraft.media
 	import flash.utils.ByteArray;
 	
 	import codeCraft.core.CodeCraft;
+	import codeCraft.display.Menu;
 	import codeCraft.events.Events;
 	
 	
@@ -37,6 +38,8 @@ package codeCraft.media
 		private static var _statusMicrophone:Boolean = false;
 		private static var _soundBytes:ByteArray = new ByteArray();
 		private static var _soundO:ByteArray = new ByteArray();
+		/* indica si la seccion de donde se detiene es playaudio es al activar el evento de boton de play */
+		private static var _activadoClicPlay:Boolean = false;
 		
 		
 		/**
@@ -217,9 +220,12 @@ package codeCraft.media
 				_soundChannel=_sound.play();
 				Events.listener(_soundChannel,Event.SOUND_COMPLETE, playSoundComplete);
 				_buttonPlay.gotoAndStop("pause");
+				//se elimina el listener de los botones de sonido
+				Menu.removeListenerOptionsMenu();
 			}
 			else
 			{
+				_activadoClicPlay = true;
 				stopPlay();
 			}
 		}
@@ -266,6 +272,8 @@ package codeCraft.media
 			stopPlay();
 			//se restaura el audio de fondo
 			Audio.setVolumenBackground(1);
+			//se habilita nuevamente los listener para el manejo de los botones de audio
+			Menu.listenerOptionsMenu();
 		}
 		
 		/**
@@ -311,8 +319,24 @@ package codeCraft.media
 			_soundChannel.stop()
 			Events.removeListener(_soundChannel, Event.SOUND_COMPLETE,playSoundComplete);
 			_buttonPlay.gotoAndStop("play");
-			//se restaura el audio de fondo
-			Audio.setVolumenBackground(0);
+			//se verifica si se indica que se activa el clic play qe indica que el audio del fondo se peude reproducir nuevamente
+			if(_activadoClicPlay)
+			{
+				_activadoClicPlay = false;
+				//como termina la grabacion se reactiva el statusPlayer
+				MediaPlayer.statusSound(true);
+				//se restaura el audio de fondo
+				Audio.setVolumenBackground(1);
+				//se  habilita los listener para el control de los audios
+				Menu.listenerOptionsMenu();
+			}
+			else
+			{
+				//se restaura el audio de fondo
+				Audio.setVolumenBackground(0);
+				//se desactiva los listener que afectan a ls botones de audio
+				Menu.removeListenerOptionsMenu();
+			}
 		}
 		
 		/**
@@ -339,6 +363,8 @@ package codeCraft.media
 			MediaPlayer.statusSound(true);
 			//se restaura el audio de fondo
 			Audio.setVolumenBackground(1);
+			//se  habilita los listener para el control de los audios
+			Menu.listenerOptionsMenu();
 		}
 		
 		/**

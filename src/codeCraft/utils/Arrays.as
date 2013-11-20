@@ -2,10 +2,18 @@ package codeCraft.utils {
 	import codeCraft.debug.Debug;
 	import codeCraft.error.Validation;
 
+	/**
+	 * 
+	 * @author luisfelipe
+	 */
 	public class Arrays
 	{
 
 
+		/**
+		 * 
+		 * @param array
+		 */
 		public static function stop(array:Array):void
 		{
 			try
@@ -21,6 +29,10 @@ package codeCraft.utils {
 			}
 		}
 
+		/**
+		 * 
+		 * @param array
+		 */
 		public static function play(array:Array):void
 		{
 			try
@@ -45,6 +57,13 @@ package codeCraft.utils {
 			}
 		}
 
+		/**
+		 * 
+		 * @param array
+		 * @param valor
+		 * @param type
+		 * @return 
+		 */
 		public static function indexOf(array:*, valor:* = null, type:String = "normal"):* {
 			var _posicionArray:Array = new Array();
 			if (array is Array) {
@@ -99,6 +118,12 @@ package codeCraft.utils {
 		}
 
 		//elimina un elemento del array y lo devuelve
+		/**
+		 * 
+		 * @param array
+		 * @param object
+		 * @return 
+		 */
 		public static function remove (array:Array, object:*):* {
 			var _posicion:Number = indexOf(array,object,'todo');
 			if(_posicion != -1){
@@ -110,6 +135,11 @@ package codeCraft.utils {
 		}
 
 		//reordena un array poniendo ubicando los elementos de adelante a atras
+		/**
+		 * 
+		 * @param array
+		 * @return 
+		 */
 		public static function reverse (array:Array):Array{
 			var arrayTemp:Array = new Array();
 			for (var i:int = array.length; i > 0; i--){
@@ -119,6 +149,11 @@ package codeCraft.utils {
 		}
 
 		//desordena un array
+		/**
+		 * 
+		 * @param array
+		 * @return 
+		 */
 		public static function random(array:Array):Array
 		{
 			if(array != null)
@@ -197,6 +232,26 @@ package codeCraft.utils {
 			}
 			return true;
 		}
+		
+		
+		/**
+		 * Retorna Boolea true si llega el caso de que el tipo de valores almacenados en el array son los ingresados, si llega a haber 
+		 * un solo elemento que no sea del tipo se devuelve false
+		 * @param array
+		 * @param type
+		 * @return 
+		 */
+		public static function verifyType (array:Array, type:*):Boolean
+		{
+			for (var i:uint = 0; i < array.length; i++)
+			{
+				if(!(array[i] is type))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 
 
 		/**
@@ -221,6 +276,19 @@ package codeCraft.utils {
 			{
 				return null;
 			}
+		}
+		
+		public static function reload(array:Array):Array 
+		{
+			var arrayTemporal:Array = new Array();
+			for(var i:int = 0; i < array.length; i++)
+			{
+				if(array[i] != undefined || array[i] != null)
+				{
+					arrayTemporal.push(array[i]);
+				}
+			}
+			return arrayTemporal;
 		}
 
 	}

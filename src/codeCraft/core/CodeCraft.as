@@ -13,7 +13,7 @@
 	import flash.text.TextField;
 	import flash.ui.ContextMenu;
 	import flash.ui.ContextMenuItem;
-
+	
 	import codeCraft.debug.Debug;
 	import codeCraft.display.Menu;
 	import codeCraft.error.Validation;
@@ -65,8 +65,7 @@
 		 * @param functionPreloadComplete Indica la funcion que se devolvera cuando finalice el proceso de precarga, por defecto es null indicando que no hay precarga
 		 */
 		public static function initialize (object:Object, functionPreloadComplete:* = null):void
-		{
-			trace("gato");
+		{ 
 			CodeCraft.mainObject = object;
 			//crea el recuadro que hace de mascara para recortar elescenario
 			maskStage.graphics.beginFill(0x000000, 1);
@@ -121,7 +120,8 @@
 			}
 			catch(e:Error)
 			{
-				Debug.print("Error al momento de realizar la precarga del contenido.","CodeCraft.preloadUpdate","Error CodCraft ");
+				Debug.print("Error al momento de realizar la precarga del contenido.\n Verificique que un elemento no tenga la vinculacion AS y a la vez sea utilizado con instancias de movieclip en la linea de tiempo, puede que este duplicado la instancias, vinculacion AS de la biblioteca o variables del movieclip.","CodeCraft.preloadUpdate","Error CodCraft ");
+				Debug.print("Ruta Error: \n" + e.getStackTrace(),"CodeCraft.preloadUpdate","Error CodCraft ");
 			}
 		}
 
@@ -143,24 +143,31 @@
 
 		public static function getChildren (parent:*, frame:int = 0):Array
 		{
-			var arrayChildren:Array = new Array();
-			if(parent is Object || parent is MovieClip)
+			if(mainObject != null)
 			{
-				if(frame != 0)
+				var arrayChildren:Array = new Array();
+				if(parent is Object || parent is MovieClip)
 				{
-					parent.gotoAndStop(frame)
+					if(frame != 0)
+					{
+						parent.gotoAndStop(frame)
+					}
+					for(var i:uint = 0; i < parent.numChildren; i++)
+					{
+						var object:* = parent.getChildAt(i);
+						arrayChildren.push(object);
+					}
 				}
-				for(var i:uint = 0; i < parent.numChildren; i++)
+				else 
 				{
-					var object:* = parent.getChildAt(i);
-					arrayChildren.push(object);
+					//Validation.error('El elemento parent de getChildren no es un Object o movieClip por lo que no se puede obtener los children');
 				}
+				return arrayChildren;
 			}
 			else
 			{
-				Validation.error('El elemento parent de getChildren no es un Object o movieClip por lo que no se puede obtener los children');
+				return null;
 			}
-			return arrayChildren;
 		}
 
 		public static function store(object:Object, cantidad:Number = 1, nameObject:String = "clip_"):Array
@@ -238,7 +245,11 @@
 									}
 									catch(error:Error)
 									{
-										Debug.print("El label no existe.","CodeCraft.stopFrame","Falla CodeCraft ");
+										//se verifica si esta activa la opcion de depuraacion
+										if(Debug.traceActivos)
+										{
+											Debug.print("El label no existe.","CodeCraft.stopFrame","Falla CodeCraft ");
+										}
 									}
 								}
 							}
@@ -256,7 +267,11 @@
 			}
 			catch (error:Error)
 			{
-				Validation.error('El object de la funcion stopFrame no es un elemento valido');
+				//se verifica si esta activa la opcion de depuraacion
+				if(Debug.traceActivos)
+				{
+					Validation.error('El object de la funcion stopFrame no es un elemento valido');
+				}
 			}
 		}
 
