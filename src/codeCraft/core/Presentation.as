@@ -363,15 +363,15 @@ package codeCraft.core {
 		{
 			Events.listener(navigation['buttonLeft'], MouseEvent.CLICK, navigationButton,true,true);
 			Events.listener(navigation['buttonRight'], MouseEvent.CLICK, navigationButton,true,true);
-			Events.listener(CodeCraft.getMainObject(),KeyboardEvent.KEY_DOWN, navigationKeyBoard);
-			Events.listener(navigation['container'], MouseEvent.CLICK, CodeCraft.focoNavigation,false);
+			Events.listener(CodeCraft.getMainObject().stage,KeyboardEvent.KEY_DOWN, navigationKeyBoard);
+			Events.listener(CodeCraft.getMainObject().stage, MouseEvent.CLICK, CodeCraft.focoNavigation,false);
 		}
 		private static function removeListenerPresentation ():void 
 		{
 			Events.removeListener(navigation['buttonLeft'], MouseEvent.CLICK, navigationButton);
 			Events.removeListener(navigation['buttonRight'], MouseEvent.CLICK, navigationButton);
-			Events.removeListener(CodeCraft.getMainObject(),KeyboardEvent.KEY_DOWN, navigationKeyBoard);
-			Events.removeListener(navigation['container'], MouseEvent.CLICK, CodeCraft.focoNavigation,false);
+			Events.removeListener(CodeCraft.getMainObject().stage,KeyboardEvent.KEY_DOWN, navigationKeyBoard);
+			Events.removeListener(CodeCraft.getMainObject().stage, MouseEvent.CLICK, CodeCraft.focoNavigation,false);
 			if(_soundActive)
 			{
 				Events.removeListener(CodeCraft.getMainObject(),Event.ENTER_FRAME, detectChangeFrame);

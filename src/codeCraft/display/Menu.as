@@ -134,7 +134,6 @@ package codeCraft.display
 			//se verifica si el array de la posicion es null, si lo es se asigna un valor por defecto para ubicar el elmento container
 			if(position == null)
 			{
-				trace(1);
 				position = new Array(CodeCraft.getMainObject().stage.stageWidth - (container.width + 5), 5);
 			}
 			_positionMenuOptions = position;

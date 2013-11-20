@@ -89,12 +89,15 @@ package codeCraft.media
 		
 		public static function reload(ruta:* = null):void
 		{
-			detenerAudio();
-			_currentPosition = 0;
-			_barraProgreso.scaleX = 0;
-			if(ruta != null)
+			if(_container != null)
 			{
-				loadSound(ruta);	
+				detenerAudio();
+				_currentPosition = 0;
+				_barraProgreso.scaleX = 0;
+				if(ruta != null)
+				{
+					loadSound(ruta);	
+				}
 			}
 		}
 
@@ -349,19 +352,26 @@ package codeCraft.media
 		 */
 		private static function soundProgress(event:Event):void
 		{
-			
-			var loadTime:Number = _sound.bytesLoaded / _sound.bytesTotal;
-			var loadPercent:uint = Math.round(100 * loadTime);
-			var estimatedLength:int = Math.ceil(_sound.length / (loadTime));
-			var playbackPercent:uint = Math.round(100 * (_channelSound.position / estimatedLength));
-			if(_barraProgreso.scaleX < 1 && _barraProgreso.scaleX >= 0)
+			//el try se usa para evitar problemas al no existir el audio o tener problemas de conexion
+			try
 			{
-				_barraProgreso.scaleX = playbackPercent/100;
-				_duration = estimatedLength;
+				var loadTime:Number = _sound.bytesLoaded / _sound.bytesTotal;
+				var loadPercent:uint = Math.round(100 * loadTime);
+				var estimatedLength:int = Math.ceil(_sound.length / (loadTime));
+				var playbackPercent:uint = Math.round(100 * (_channelSound.position / estimatedLength));
+				if(_barraProgreso.scaleX < 1 && _barraProgreso.scaleX >= 0)
+				{
+					_barraProgreso.scaleX = playbackPercent/100;
+					_duration = estimatedLength;
+				}
+				else
+				{
+					detenerAudio();
+				}
 			}
-			else
+			catch(erro:Error)
 			{
-				detenerAudio();
+				
 			}
 		}
 
@@ -418,16 +428,23 @@ package codeCraft.media
 
 		private static function detenerAudio():void
 		{
-			//se verifica  si tiene una funcion que devolver
-			if(_functionReturn != null)
+			try
 			{
-				Timers.timer(2,_functionReturn);
+				//se verifica  si tiene una funcion que devolver
+				if(_functionReturn != null)
+				{
+					Timers.timer(2,_functionReturn);
+				}
+				_currentPosition = _channelSound.position;
+				_channelSound.stop();
+				_buttonPlay.gotoAndStop("play");
+				Audio.setVolumenBackground(1);
+				Events.removeListener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
 			}
-			_currentPosition = _channelSound.position;
-			_channelSound.stop();
-			_buttonPlay.gotoAndStop("play");
-			Audio.setVolumenBackground(1);
-			Events.removeListener(_channelSound,Event.SOUND_COMPLETE, soundComplete);
+			catch(error:Error)
+			{
+				
+			}
 		}
 
 		private static function reproducirAudio ():void
